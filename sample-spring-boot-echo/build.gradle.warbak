@@ -14,15 +14,9 @@
  * under the License.
  */
 
+apply plugin: 'org.springframework.boot'
+apply plugin: 'war'
 dependencies {
-    compile project(':line-bot-api-client')
-    compile project(':line-bot-model')
-    compile project(':line-bot-servlet')
-    compile 'org.springframework.boot:spring-boot-autoconfigure'
-    compile ('org.springframework.boot:spring-boot-starter-web')
-    /*{
-        exclude module:"spring-boot-starter-tomcat"
-    }
-    optional 'javax.servlet:javax.servlet-api'*/
-    optional 'javax.validation:validation-api'
+    compile project(':line-bot-spring-boot')
+    optional 'javax.servlet:javax.servlet-api'
 }
