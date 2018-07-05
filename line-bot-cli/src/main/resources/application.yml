@@ -1,0 +1,40 @@
+spring:
+  main:
+    web-environment: false
+    banner-mode: 'off'
+
+line.bot:
+  handler.enabled: false
+  channelSecret: 747855baf414406edc111e4929f84dd2
+  channelToken: kQADi5rlHqFb+bicIPDnn27URbsP7JKtOFKy5PxZuLfOGtidYrfj70s6XjVzWMzWP/p5NDhVeOWm4GzGdyo8HarfxiDNJeBlX6s54U/jetQiReIkaUmoxpLtv5W7Jrl4R2W7t0R7OO3saHYrKJ/K+wdB04t89/1O/w1cDnyilFU=
+logging:
+  level:
+    root: WARN
+    com.linecorp: ${log:INFO}
+    com.linecorp.bot.client.wire: ${wirelog:INFO}
+  pattern:
+    console: >-
+      %clr(%d{HH:mm:ss}){faint}
+      %clr(%5p)
+      %clr(-){faint}
+      %clr(%-20.20logger{19}){cyan}
+      %clr(:){faint}
+      %m%n%wEx
+
+---
+spring.profiles: debug
+logging:
+  level:
+    root: DEBUG
+    com.linecorp: ${log:DEBUG}
+    com.linecorp.bot.client.wire: ${wirelog:DEBUG}
+  pattern:
+    console: >-
+      %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint}
+      %clr(${LOG_LEVEL_PATTERN:-%5p})
+      %clr(${PID:- }){magenta}
+      %clr(---){faint}
+      %clr([%15.15t]){faint}
+      %clr(%-40.40logger{39}){cyan}
+      %clr(:){faint}
+      %m%n%wEx
