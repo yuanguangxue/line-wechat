@@ -49,7 +49,8 @@ public class EchoApplication {
     }
 
     @EventMapping
-    public void handleDefaultMessageEvent(Event event) {
+    public Message handleDefaultMessageEvent(Event event) {
         System.out.println("event: " + event);
+        return new TextMessage("你好！这是自动回复的消息，你无须理会");
     }
 }
