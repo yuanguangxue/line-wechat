@@ -18,6 +18,7 @@ package com.linecorp.bot.spring.boot;
 
 import java.nio.charset.StandardCharsets;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +28,7 @@ import com.linecorp.bot.client.LineSignatureValidator;
 import com.linecorp.bot.servlet.LineBotCallbackRequestParser;
 import com.linecorp.bot.spring.boot.interceptor.LineBotServerInterceptor;
 import com.linecorp.bot.spring.boot.support.LineBotServerArgumentProcessor;
-
+@Slf4j
 @Component
 @ConditionalOnWebApplication
 public class LineBotWebMvcBeans {
@@ -46,8 +47,11 @@ public class LineBotWebMvcBeans {
 
     @Bean
     public LineSignatureValidator lineSignatureValidator() {
+        log.info("channelSecret : {}",lineBotProperties.getChannelSecret());
         return new LineSignatureValidator(
-                lineBotProperties.getChannelSecret().getBytes(StandardCharsets.US_ASCII));
+                lineBotProperties.getChannelSecret().getBytes(StandardCharsets.UTF_8));
+        /*return new LineSignatureValidator(
+                lineBotProperties.getChannelSecret().getBytes(StandardCharsets.US_ASCII));*/
     }
 
     @Bean
