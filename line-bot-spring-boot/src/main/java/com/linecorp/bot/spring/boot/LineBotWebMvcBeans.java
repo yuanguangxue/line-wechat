@@ -48,10 +48,10 @@ public class LineBotWebMvcBeans {
     @Bean
     public LineSignatureValidator lineSignatureValidator() {
         log.info("channelSecret : {}",lineBotProperties.getChannelSecret());
-        return new LineSignatureValidator(
-                lineBotProperties.getChannelSecret().getBytes(StandardCharsets.UTF_8));
         /*return new LineSignatureValidator(
-                lineBotProperties.getChannelSecret().getBytes(StandardCharsets.US_ASCII));*/
+                lineBotProperties.getChannelSecret().getBytes(StandardCharsets.UTF_8));*/
+        return new LineSignatureValidator(
+                lineBotProperties.getChannelSecret().getBytes(StandardCharsets.US_ASCII));
     }
 
     @Bean
