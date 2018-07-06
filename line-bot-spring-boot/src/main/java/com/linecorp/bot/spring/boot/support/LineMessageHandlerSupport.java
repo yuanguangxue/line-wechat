@@ -77,14 +77,16 @@ import lombok.extern.slf4j.Slf4j;
 public class LineMessageHandlerSupport {
     private static final Comparator<HandlerMethod> HANDLER_METHOD_PRIORITY_COMPARATOR =
             Comparator.comparing(HandlerMethod::getPriority).reversed();
-    private final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory;
+    //private final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory;
+    private final PushByReturnValueConsumer.Factory returnValueConsumerFactory;
     private final ConfigurableApplicationContext applicationContext;
 
     volatile List<HandlerMethod> eventConsumerList;
 
     @Autowired
     public LineMessageHandlerSupport(
-            final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory,
+            //final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory,
+            final PushByReturnValueConsumer.Factory returnValueConsumerFactory,
             final ConfigurableApplicationContext applicationContext) {
         this.returnValueConsumerFactory = returnValueConsumerFactory;
         this.applicationContext = applicationContext;

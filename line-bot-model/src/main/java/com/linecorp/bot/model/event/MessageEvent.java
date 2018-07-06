@@ -32,7 +32,7 @@ import lombok.Value;
  */
 @Value
 @JsonTypeName("message")
-public class MessageEvent<T extends MessageContent> implements Event, ReplyEvent {
+public class MessageEvent<T extends MessageContent> implements Event, ReplyEvent, PushEvent{
     /**
      * Token for replying to this event
      */
@@ -53,12 +53,22 @@ public class MessageEvent<T extends MessageContent> implements Event, ReplyEvent
      */
     private final Instant timestamp;
 
+    /**
+     *
+     */
+    private final String to;
+
     @JsonCreator
     public MessageEvent(
             final String replyToken,
             final Source source,
             final T message,
             final Instant timestamp) {
+        if(source !=null){
+            this.to = source.getUserId();
+        }else {
+            this.to = null;
+        }
         this.replyToken = replyToken;
         this.source = source;
         this.message = message;
