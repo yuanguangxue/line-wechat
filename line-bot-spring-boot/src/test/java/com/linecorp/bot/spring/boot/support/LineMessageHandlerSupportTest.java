@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Method;
 import java.util.function.Predicate;
 
+import com.linecorp.bot.model.event.PushEvent;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,15 +61,23 @@ public class LineMessageHandlerSupportTest {
     private ReplyByReturnValueConsumer.Factory replyByReturnValueConsumerFactory;
 
     @Mock
+    private PushByReturnValueConsumer.PushFactory pushReturnValueConsumerFactory;
+
+    @Mock
     private ReplyByReturnValueConsumer replyByReturnValueConsumer;
+
+    @Mock
+    private PushByReturnValueConsumer pushByReturnValueConsumer;
 
     @InjectMocks
     private LineMessageHandlerSupport target;
 
     @Before
     public void setUp() {
-        when(replyByReturnValueConsumerFactory.createForEvent(any()))
-                .thenReturn(replyByReturnValueConsumer);
+        /*when(replyByReturnValueConsumerFactory.createForEvent(any()))
+                .thenReturn(replyByReturnValueConsumer);*/
+        when(pushReturnValueConsumerFactory.createForEvent(any()))
+                .thenReturn(pushByReturnValueConsumer);
     }
 
     @Test
@@ -127,8 +136,8 @@ public class LineMessageHandlerSupportTest {
         target.dispatch(event);
 
         // Verify
-        verify(replyByReturnValueConsumerFactory).createForEvent(event);
-        verify(replyByReturnValueConsumer, times(1)).accept(new TextMessage("Message from Handler method"));
+        verify(pushReturnValueConsumerFactory).createForEvent(event);
+        verify(pushByReturnValueConsumer, times(1)).accept(new TextMessage("Message from Handler method"));
     }
 
     @LineMessageHandler
@@ -155,7 +164,7 @@ public class LineMessageHandlerSupportTest {
         private final String replyMessage;
 
         @EventMapping
-        public TextMessage reply(final ReplyEvent replySupportEvent) {
+        public TextMessage reply(final PushEvent replySupportEvent) {
             return new TextMessage(replyMessage);
         }
     }

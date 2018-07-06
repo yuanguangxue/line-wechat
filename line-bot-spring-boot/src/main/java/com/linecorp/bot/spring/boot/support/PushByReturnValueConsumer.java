@@ -27,11 +27,11 @@ public class PushByReturnValueConsumer implements Consumer<Object> {
     private final Event originalEvent;
 
     @Component
-    public static class Factory {
+    public static class PushFactory {
         private final LineMessagingClient lineMessagingClient;
 
         @Autowired
-        public Factory(final LineMessagingClient lineMessagingClient) {
+        public PushFactory(final LineMessagingClient lineMessagingClient) {
             this.lineMessagingClient = lineMessagingClient;
         }
 

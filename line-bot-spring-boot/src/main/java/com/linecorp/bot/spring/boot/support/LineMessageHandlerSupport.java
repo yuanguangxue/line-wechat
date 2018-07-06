@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.linecorp.bot.model.event.PushEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -72,13 +73,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Beta
 @RestController
-@Import(ReplyByReturnValueConsumer.Factory.class)
+@Import(PushByReturnValueConsumer.PushFactory.class)
 @ConditionalOnProperty(name = "line.bot.handler.enabled", havingValue = "true", matchIfMissing = true)
 public class LineMessageHandlerSupport {
     private static final Comparator<HandlerMethod> HANDLER_METHOD_PRIORITY_COMPARATOR =
             Comparator.comparing(HandlerMethod::getPriority).reversed();
     //private final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory;
-    private final PushByReturnValueConsumer.Factory returnValueConsumerFactory;
+    private final PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory;
     private final ConfigurableApplicationContext applicationContext;
 
     volatile List<HandlerMethod> eventConsumerList;
@@ -86,9 +87,9 @@ public class LineMessageHandlerSupport {
     @Autowired
     public LineMessageHandlerSupport(
             //final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory,
-            final PushByReturnValueConsumer.Factory returnValueConsumerFactory,
+            final PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory,
             final ConfigurableApplicationContext applicationContext) {
-        this.returnValueConsumerFactory = returnValueConsumerFactory;
+        this.returnValueConsumerPushFactory = returnValueConsumerPushFactory;
         this.applicationContext = applicationContext;
 
         applicationContext.addApplicationListener(event -> {
@@ -201,7 +202,7 @@ public class LineMessageHandlerSupport {
 
     private void handleReturnValue(final Event event, final Object returnValue) {
         if (returnValue != null) {
-            returnValueConsumerFactory.createForEvent(event)
+            returnValueConsumerPushFactory.createForEvent(event)
                                       .accept(returnValue);
         }
     }
@@ -215,7 +216,11 @@ public class LineMessageHandlerSupport {
             if (mapping == ReplyEvent.class) {
                 supportEvent = ReplyEvent.class;
                 messageContentType = null;
-            } else if (mapping instanceof Class) {
+            }else if(mapping == PushEvent.class){
+                supportEvent = PushEvent.class;
+                messageContentType = null;
+            }
+            else if (mapping instanceof Class) {
                 Preconditions.checkState(Event.class.isAssignableFrom((Class<?>) mapping),
                                          "Handler argument type should BE-A Event. But {}",
                                          mapping.getClass());
