@@ -37,6 +37,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.annotations.Beta;
@@ -73,12 +74,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Beta
 @RestController
-@Import(PushByReturnValueConsumer.PushFactory.class)
+@Import({PushByReturnValueConsumer.PushFactory.class,ReplyByReturnValueConsumer.Factory.class})
 @ConditionalOnProperty(name = "line.bot.handler.enabled", havingValue = "true", matchIfMissing = true)
 public class LineMessageHandlerSupport {
     private static final Comparator<HandlerMethod> HANDLER_METHOD_PRIORITY_COMPARATOR =
             Comparator.comparing(HandlerMethod::getPriority).reversed();
-    //private final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory;
+    private final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory;
     private final PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory;
     private final ConfigurableApplicationContext applicationContext;
 
@@ -86,9 +87,10 @@ public class LineMessageHandlerSupport {
 
     @Autowired
     public LineMessageHandlerSupport(
-            //final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory,
+            final ReplyByReturnValueConsumer.Factory returnValueConsumerFactory,
             final PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory,
             final ConfigurableApplicationContext applicationContext) {
+        this.returnValueConsumerFactory = returnValueConsumerFactory;
         this.returnValueConsumerPushFactory = returnValueConsumerPushFactory;
         this.applicationContext = applicationContext;
 
@@ -177,6 +179,12 @@ public class LineMessageHandlerSupport {
         events.forEach(this::dispatch);
     }
 
+    @RequestMapping("/")
+    public String helloWord(){
+        System.out.println("helloWord........");
+        return "helloWord";
+    }
+
     @VisibleForTesting
     void dispatch(Event event) {
         try {
@@ -204,6 +212,9 @@ public class LineMessageHandlerSupport {
         if (returnValue != null) {
             returnValueConsumerPushFactory.createForEvent(event)
                                       .accept(returnValue);
+        }else {
+            returnValueConsumerFactory.createForEvent(event)
+                    .accept("你好，不必回复这是假程序");
         }
     }
 
