@@ -16,6 +16,11 @@
 
 package com.example.bot.spring.echo;
 
+import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.profile.UserProfileResponse;
+import com.linecorp.bot.spring.boot.LineBotProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -27,18 +32,40 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 
+import java.util.concurrent.ExecutionException;
+
+@Slf4j
 @SpringBootApplication
 @LineMessageHandler
 public class EchoApplication {
+
+
+
     public static void main(String[] args) {
         SpringApplication.run(EchoApplication.class, args);
     }
+
+    @Autowired
+    private LineBotProperties lineBotProperties;
 
     @EventMapping
     public Message handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
 
         System.out.println("event: " + event);
         final String originalMessageText = event.getMessage().getText();
+
+        //获取用户信息
+        try {
+            final LineMessagingClient client = LineMessagingClient
+                    .builder(lineBotProperties.getChannelToken())
+                    .build();
+            final UserProfileResponse userProfileResponse;
+            userProfileResponse = client.getProfile(event.getTo()).get();
+            log.info("userProfileResponse : {}",userProfileResponse);
+        } catch (InterruptedException | ExecutionException e) {
+            //e.printStackTrace();
+            log.error("error : ",e);
+        }
 
         switch (originalMessageText.toUpperCase()) {
             case "FLEX":
