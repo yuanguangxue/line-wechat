@@ -3,6 +3,7 @@ package com.linecorp.bot.spring.boot.support;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.client.LineMessagingWeChatClient;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.PushEvent;
@@ -24,20 +25,24 @@ import static java.util.Collections.singletonList;
 public class PushByReturnValueConsumer implements Consumer<Object> {
 
     private final LineMessagingClient lineMessagingClient;
+    private final LineMessagingWeChatClient lineMessagingWeChatClient;
     private final Event originalEvent;
 
     @Component
     public static class PushFactory {
         private final LineMessagingClient lineMessagingClient;
+        private final LineMessagingWeChatClient lineMessagingWeChatClient;
 
         @Autowired
-        public PushFactory(final LineMessagingClient lineMessagingClient) {
+        public PushFactory(final LineMessagingClient lineMessagingClient,final LineMessagingWeChatClient lineMessagingWeChatClient) {
             this.lineMessagingClient = lineMessagingClient;
+            this.lineMessagingWeChatClient = lineMessagingWeChatClient;
         }
 
         PushByReturnValueConsumer createForEvent(final Event event) {
             return builder()
                     .lineMessagingClient(lineMessagingClient)
+                    .lineMessagingWeChatClient(lineMessagingWeChatClient)
                     .originalEvent(event)
                     .build();
         }
@@ -80,7 +85,10 @@ public class PushByReturnValueConsumer implements Consumer<Object> {
 
     private void reply(final List<Message> messages) {
         final PushEvent pushEvent = (PushEvent) originalEvent;
-        lineMessagingClient.pushMessage(new PushMessage(pushEvent.getTo(), messages))
+        /*lineMessagingClient.pushMessage(new PushMessage(pushEvent.getTo(), messages))
+                .whenComplete(this::logging);*/
+
+        lineMessagingWeChatClient.pushMessage(new PushMessage(pushEvent.getTo(), messages))
                 .whenComplete(this::logging);
         // DO NOT BLOCK HERE, otherwise, next message processing will be BLOCKED.
     }

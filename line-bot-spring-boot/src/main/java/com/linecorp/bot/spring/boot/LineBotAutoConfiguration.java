@@ -16,6 +16,7 @@
 
 package com.linecorp.bot.spring.boot;
 
+import com.linecorp.bot.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -24,10 +25,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import com.linecorp.bot.client.ChannelManagementSyncClient;
-import com.linecorp.bot.client.ChannelTokenSupplier;
-import com.linecorp.bot.client.FixedChannelTokenSupplier;
-import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.spring.boot.support.LineMessageHandlerSupport;
 
 /**
@@ -65,5 +62,17 @@ public class LineBotAutoConfiguration {
             final ChannelTokenSupplier channelTokenSupplier) {
         return ChannelManagementSyncClient.builder(channelTokenSupplier)
                                           .build();
+    }
+
+    @Bean
+    public LineMessagingWeChatClient lineMessagingWeChatClient(
+            final ChannelTokenSupplier channelTokenSupplier) {
+        return LineMessagingWeChatClient
+                .builder(channelTokenSupplier)
+                .apiEndPoint(LineMessagingWeChatClientBuilder.DEFAULT_API_END_POINT)
+                .connectTimeout(LineMessagingWeChatClientBuilder.DEFAULT_CONNECT_TIMEOUT)
+                .readTimeout(LineMessagingWeChatClientBuilder.DEFAULT_READ_TIMEOUT)
+                .writeTimeout(LineMessagingWeChatClientBuilder.DEFAULT_WRITE_TIMEOUT)
+                .build();
     }
 }
