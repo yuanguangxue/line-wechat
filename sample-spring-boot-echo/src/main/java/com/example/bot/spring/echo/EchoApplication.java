@@ -17,6 +17,7 @@
 package com.example.bot.spring.echo;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.support.PushByReturnValueConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,7 @@ public class EchoApplication {
         if(event instanceof MessageEvent){
             final String originalMessageText = ((MessageEvent<TextMessageContent>)event).getMessage().getText();
             returnValueConsumerPushFactory.createForEvent(event)
-                    .accept(originalMessageText);
+                    .accept(new TextMessage(originalMessageText));
         }
     }
 
