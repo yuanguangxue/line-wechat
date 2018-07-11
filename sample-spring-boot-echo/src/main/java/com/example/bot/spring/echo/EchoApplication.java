@@ -16,9 +16,8 @@
 
 package com.example.bot.spring.echo;
 
-import com.linecorp.bot.client.LineMessagingClient;
-import com.linecorp.bot.model.profile.UserProfileResponse;
-import com.linecorp.bot.spring.boot.LineBotProperties;
+import com.google.common.annotations.VisibleForTesting;
+import com.linecorp.bot.spring.boot.support.PushByReturnValueConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -27,57 +26,55 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Import;
 
-import java.util.concurrent.ExecutionException;
+
 
 @Slf4j
 @SpringBootApplication
 @LineMessageHandler
+@Import({PushByReturnValueConsumer.PushFactory.class})
+@ConditionalOnProperty(name = "line.bot.handler.enabled", havingValue = "true", matchIfMissing = true)
 public class EchoApplication {
-
-
 
     public static void main(String[] args) {
         SpringApplication.run(EchoApplication.class, args);
     }
 
+    private final PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory;
+
     @Autowired
-    private LineBotProperties lineBotProperties;
+    public EchoApplication(PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory){
+        this.returnValueConsumerPushFactory = returnValueConsumerPushFactory;
+    }
 
-    @EventMapping
-    public Message handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
-
-        System.out.println("event: " + event);
-        final String originalMessageText = event.getMessage().getText();
-
-        //获取用户信息
+    @VisibleForTesting
+    void dispatch(Event event) {
         try {
-            final LineMessagingClient client = LineMessagingClient
-                    .builder(lineBotProperties.getChannelToken())
-                    .build();
-            final UserProfileResponse userProfileResponse;
-            userProfileResponse = client.getProfile(event.getTo()).get();
-            log.info("userProfileResponse : {}",userProfileResponse);
-        } catch (InterruptedException | ExecutionException e) {
-            //e.printStackTrace();
-            log.error("error : ",e);
+            dispatchInternal(event);
+        } catch (Error | Exception e) {
+            log.error(e.getMessage(), e);
         }
+    }
 
-        switch (originalMessageText.toUpperCase()) {
-            case "FLEX":
-                return new ExampleFlexMessageSupplier().get();
-            default:
-                return new TextMessage(originalMessageText);
+    private void dispatchInternal(final Event event) {
+        if(event instanceof MessageEvent){
+            final String originalMessageText = ((MessageEvent<TextMessageContent>)event).getMessage().getText();
+            returnValueConsumerPushFactory.createForEvent(event)
+                    .accept(originalMessageText);
         }
     }
 
     @EventMapping
-    public Message handleDefaultMessageEvent(Event event) {
-        System.out.println("event: " + event);
-        return new TextMessage("你好！这是自动回复的消息，你无须理会");
+    public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
+        dispatch(event);
+    }
+
+    @EventMapping
+    public void handleDefaultMessageEvent(Event event) {
+        dispatch(event);
     }
 }

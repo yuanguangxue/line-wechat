@@ -39,7 +39,7 @@ public class PushByReturnValueConsumer implements Consumer<Object> {
             this.lineMessagingWeChatClient = lineMessagingWeChatClient;
         }
 
-        PushByReturnValueConsumer createForEvent(final Event event) {
+        public PushByReturnValueConsumer createForEvent(final Event event) {
             return builder()
                     .lineMessagingClient(lineMessagingClient)
                     .lineMessagingWeChatClient(lineMessagingWeChatClient)
