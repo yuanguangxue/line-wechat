@@ -7,7 +7,7 @@ import retrofit2.Retrofit;
 
 public class LineMessagingWeChatClientBuilder {
 
-    public static final String DEFAULT_API_END_POINT = "https://guangxue.herokuapp.com/";
+    public static final String DEFAULT_API_END_POINT = "https://guangxue-test.herokuapp.com/";
     public static final long DEFAULT_CONNECT_TIMEOUT = 10_000;
     public static final long DEFAULT_READ_TIMEOUT = 10_000;
     public static final long DEFAULT_WRITE_TIMEOUT = 10_000;
