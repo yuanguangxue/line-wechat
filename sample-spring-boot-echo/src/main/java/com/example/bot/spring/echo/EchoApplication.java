@@ -60,6 +60,7 @@ public class EchoApplication {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void dispatchInternal(final Event event) {
         if(event instanceof MessageEvent){
             final String originalMessageText = ((MessageEvent<TextMessageContent>)event).getMessage().getText();
