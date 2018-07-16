@@ -4,13 +4,18 @@ package com.hp;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.hp.model.LineMessage;
+import com.hp.model.LineUserProfile;
 import com.hp.service.LineMessageService;
+import com.hp.service.LineUserProfileService;
 import com.hp.service.PushRequestService;
 import com.hp.util.LineUtils;
+import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.profile.UserProfileResponse;
+import com.linecorp.bot.spring.boot.LineBotProperties;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import com.linecorp.bot.spring.boot.support.PushByReturnValueConsumer;
@@ -20,6 +25,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Import;
+
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @SpringBootApplication
@@ -40,8 +47,16 @@ public class Application {
     private PushRequestService pushRequestService;
 
     @Autowired
-    public Application(PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory){
+    private LineUserProfileService lineUserProfileService;
+
+    private final LineBotProperties lineBotProperties;
+
+    @Autowired
+    public Application(
+            PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory,
+            LineBotProperties lineBotProperties){
         this.returnValueConsumerPushFactory = returnValueConsumerPushFactory;
+        this.lineBotProperties = lineBotProperties;
     }
 
     @VisibleForTesting
@@ -54,9 +69,18 @@ public class Application {
     }
 
     @SuppressWarnings("unchecked")
-    private void dispatchInternal(final Event event) {
+    private void dispatchInternal(final Event event) throws Exception {
         if(event instanceof MessageEvent){
-            LineMessage lineMessage = LineUtils.messageEventToEntity((MessageEvent)event);
+            MessageEvent messageEvent = (MessageEvent)event;
+            LineUserProfile lineUserProfile = null;
+            try {
+                lineUserProfile =  lineUserProfileService.getLineUserProfile(messageEvent.getTo());
+            }catch (Exception e){
+            }
+            if(lineUserProfile == null){
+                doSaveUserProfile(messageEvent.getTo());
+            }
+            LineMessage lineMessage = LineUtils.messageEventToEntity(messageEvent);
             lineMessageService.save(lineMessage);
             pushRequestService.pushLineMsg();
         }
@@ -65,6 +89,28 @@ public class Application {
     private void sendTextMessage(Event event,String originalMessageText){
         returnValueConsumerPushFactory.createForEvent(event)
                 .accept(new TextMessage(originalMessageText));
+    }
+
+    private LineUserProfile doSaveUserProfile(String userId) throws Exception {
+        UserProfileResponse userProfileResponse = getUserProfile(userId);
+        if(userProfileResponse!=null){
+            LineUserProfile lineUserProfile = LineUtils.UserProfileResponseToEntity(userProfileResponse);
+            lineUserProfileService.save(lineUserProfile);
+            return lineUserProfile;
+        }
+        throw new Exception("获取用户信息出错！");
+    }
+
+    public UserProfileResponse getUserProfile(String userId){
+        final LineMessagingClient client = LineMessagingClient
+                .builder(lineBotProperties.getChannelToken())
+                .build();
+        try {
+            return client.getProfile(userId).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @EventMapping

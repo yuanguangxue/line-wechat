@@ -23,11 +23,11 @@ public class ThymeleafController {
         return model;
     }
 
-    @RequestMapping("/webchat")
-    public ModelAndView webchat(ModelAndView model){
+    @RequestMapping("/weChat")
+    public ModelAndView weChat(ModelAndView model){
         log.info("pushServerConfig : {}", pushServerConfig);
         model.addObject("pushServerConfig",pushServerConfig);
-        model.setViewName("webchat");
+        model.setViewName("weChat");
         return model;
     }
 }

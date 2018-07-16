@@ -17,7 +17,10 @@
 package com.example.bot.spring.echo;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.profile.UserProfileResponse;
+import com.linecorp.bot.spring.boot.LineBotProperties;
 import com.linecorp.bot.spring.boot.support.PushByReturnValueConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Import;
 
+import java.util.concurrent.ExecutionException;
 
 
 @Slf4j
@@ -47,9 +51,14 @@ public class EchoApplication {
 
     private final PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory;
 
+    private final LineBotProperties lineBotProperties;
+
     @Autowired
-    public EchoApplication(PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory){
+    public EchoApplication(
+            PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory,
+            LineBotProperties lineBotProperties){
         this.returnValueConsumerPushFactory = returnValueConsumerPushFactory;
+        this.lineBotProperties = lineBotProperties;
     }
 
     @VisibleForTesting
@@ -64,9 +73,22 @@ public class EchoApplication {
     @SuppressWarnings("unchecked")
     private void dispatchInternal(final Event event) {
         if(event instanceof MessageEvent){
+
             final String originalMessageText = ((MessageEvent<TextMessageContent>)event).getMessage().getText();
             returnValueConsumerPushFactory.createForEvent(event)
                     .accept(new TextMessage(originalMessageText));
+        }
+    }
+
+    public UserProfileResponse getUserProfile(String userId){
+        final LineMessagingClient client = LineMessagingClient
+                .builder(lineBotProperties.getChannelToken())
+                .build();
+        try {
+            return client.getProfile(userId).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

@@ -19,7 +19,6 @@ function getWebSocketHead(){
 const appId = document.getElementById("appId").value;
 const appKey = document.getElementById("appKey").value;
 function init() {
-
     var pushReq = {
         "appId": appId,
         "appKey": appKey,
@@ -62,6 +61,7 @@ function batchReg() {
         reg(i);
     }
 }
+
 function reg(i) {
     if (!i) {
         i = 1;
