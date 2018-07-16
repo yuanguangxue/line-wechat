@@ -1,5 +1,6 @@
 package com.hp.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hp.exception.PushParameterException;
 import com.hp.model.*;
 import com.hp.service.LineMessageService;
@@ -120,5 +121,11 @@ public class PushController {
     @RequestMapping(value = "/lineMessageList")
     List<LineMessage> lineMessageList(){
         return lineMessageService.findAll();
+    }
+
+    @RequestMapping(value = "/pushLineMsg")
+    String pushLineMsg() throws JsonProcessingException {
+        pushRequestService.pushLineMsg();
+        return Result.success("message is send").toJson();
     }
 }
