@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>推送消息</title>
+</head>
+<body>
+<label th:text="'service url：' + ${pushServerConfig.url}"></label>
+<br/>
+<input type="text" id="serviceUrl" th:value="${pushServerConfig.url}"/>
+<input type="text" id="env" th:value="${pushServerConfig.env}"/>
+<input type="button" onclick="init()" value="连接" />
+<br/>
+
+<textarea id="msg" rows="5" cols="50">
+</textarea>
+<input type="button" onclick="send()" value="发送消息" />
+<p></p>
+<label>Connection Status:</label>
+<label id="connectionLabel"></label>
+<br/>
+<br/>
+<label>接收到的消息：</label><br/>
+<textarea id="writeMsg" rows="5" cols="50">
+</textarea>
+<br/>
+<script type="text/javascript" th:src="@{/js/push.js}"></script>
+</body>
+</html>

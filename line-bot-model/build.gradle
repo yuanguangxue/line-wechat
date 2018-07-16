@@ -24,3 +24,7 @@ dependencies {
     testCompile 'com.fasterxml.jackson.module:jackson-module-parameter-names'
     testCompile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
+//编译JAVA文件时采用UTF-8
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}

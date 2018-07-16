@@ -3,7 +3,7 @@ include 'line-bot-model'
 include 'line-bot-servlet'
 include 'line-bot-spring-boot'
 include 'line-bot-cli'
-/*include 'test-boot2-compatibility'*/
+include 'test-boot2-compatibility'
 
 /*
  * Copyright 2018 LINE Corporation
@@ -24,4 +24,5 @@ include 'line-bot-cli'
 // samples
 include 'sample-spring-boot-kitchensink'
 include 'sample-spring-boot-echo'
+include 'sample-spring-boot-wechat'
 

@@ -60,7 +60,9 @@ subprojects {
     apply plugin: 'propdeps-maven'
     apply plugin: 'propdeps-idea'
     apply plugin: 'propdeps-eclipse'
-    apply plugin: 'findbugs'
+    if(!project.name.endsWith('-wechat')){
+        apply plugin: 'findbugs'
+    }
     apply plugin: 'java'
     apply plugin: 'io.franzbecker.gradle-lombok'
     if (new File("${project.rootDir}/.git").exists()) {
@@ -125,7 +127,9 @@ subprojects {
         version = '1.18.0'
     }
 
-    if (!project.name.startsWith('sample-')) {
+
+
+    if (!project.name.startsWith('sample-') && !project.name.startsWith('test-')) {
         task delombok(type: io.franzbecker.gradle.lombok.task.DelombokTask, dependsOn: compileJava) {
             ext.outputDir = file("$buildDir/delombok")
             outputs.dir(outputDir)
@@ -139,6 +143,7 @@ subprojects {
             dependsOn delombok
             source = delombok.outputDir
             options.locale = 'en_US'
+            //options.encoding = 'utf-8'
             options.addStringOption('Xdoclint:none', '-quiet')
             // To create javadoc for generated method&constructor, delombok & run javadoc on delombok.outputDir.
         }
@@ -232,3 +237,4 @@ repositories {
 task wrapper(type: Wrapper) {
     gradleVersion = '3.0'
 }
+

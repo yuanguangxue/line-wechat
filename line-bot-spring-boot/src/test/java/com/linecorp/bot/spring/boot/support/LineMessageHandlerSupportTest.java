@@ -74,10 +74,10 @@ public class LineMessageHandlerSupportTest {
 
     @Before
     public void setUp() {
-        /*when(replyByReturnValueConsumerFactory.createForEvent(any()))
-                .thenReturn(replyByReturnValueConsumer);*/
-        when(pushReturnValueConsumerFactory.createForEvent(any()))
-                .thenReturn(pushByReturnValueConsumer);
+        when(replyByReturnValueConsumerFactory.createForEvent(any()))
+                .thenReturn(replyByReturnValueConsumer);
+       /* when(pushReturnValueConsumerFactory.createForEvent(any()))
+                .thenReturn(pushByReturnValueConsumer);*/
     }
 
     @Test
@@ -136,8 +136,8 @@ public class LineMessageHandlerSupportTest {
         target.dispatch(event);
 
         // Verify
-        verify(pushReturnValueConsumerFactory).createForEvent(event);
-        verify(pushByReturnValueConsumer, times(1)).accept(new TextMessage("Message from Handler method"));
+        verify(replyByReturnValueConsumerFactory).createForEvent(event);
+        verify(replyByReturnValueConsumer, times(1)).accept(new TextMessage("Message from Handler method"));
     }
 
     @LineMessageHandler

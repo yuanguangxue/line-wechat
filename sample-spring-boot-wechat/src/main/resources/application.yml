@@ -1,0 +1,62 @@
+#
+# Copyright 2018 LINE Corporation
+#
+# LINE Corporation licenses this file to you under the Apache License,
+# version 2.0 (the "License"); you may not use this file except in compliance
+# with the License. You may obtain a copy of the License at:
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#This is tempalte file for configuration.
+#Please copy as `application.yml` and change your value.
+
+line.bot:
+  channel-secret: '747855baf414406edc111e4929f84dd2'
+  channel-token: 'q0J6vjffZaciiUv0HcJhR6wCSxKM2JNy9YkGG3fZx+FAoeST1DaPX8nd89/dDA5XP/p5NDhVeOWm4GzGdyo8HarfxiDNJeBlX6s54U/jetSQ+Kw5ORtzfplVQTZVyfdTvm4s4Ob6SlQ9aJwfUPkyNAdB04t89/1O/w1cDnyilFU='
+  handler.path: /callback
+
+# To remove Client wire logs. Please comment out following lines.
+# See: https://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html
+#
+#logging.level:
+#   com.linecorp.bot.client.wire: INFO
+server:
+  port: 8080
+spring:
+  application:
+    name: websocket-chat
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test
+    username: postgres
+    password: 123456
+    driverClassName: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: update
+        temp:
+          use_jdbc_metadata_defaults: false
+  thymeleaf:
+      prefix: classpath:/templates/
+      suffix: .html
+      mode: HTML5
+      encoding: UTF-8
+      content-type: text/html
+      cache: false
+  resources:
+      chain:
+          strategy:
+            content:
+              enabled: true
+              paths:  /**
+push-server:
+  mode: BOTH # 在线和离线推送服务器(ONLINE,OFFLINE)
+  env: DEV #开发或正式
+  url: localhost:8080

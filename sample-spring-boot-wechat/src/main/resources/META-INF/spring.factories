@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.hp.config.PushServerConfig,com.hp.service.WebSocketConfig
