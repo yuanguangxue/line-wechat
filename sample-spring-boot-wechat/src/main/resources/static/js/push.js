@@ -72,7 +72,7 @@ function reg(i) {
         },
         body: JSON.stringify({
             "alias": "testuser"+i,
-            "appId": "2c910b266493103c0164931335070000",
+            "appId": "2c9123aa64a1a0a70164a1a182150001",
             "platform": "ANDROID",
             "nativeToken": "andToken0011"+i,
             "tag": ["tag1","sz"]
