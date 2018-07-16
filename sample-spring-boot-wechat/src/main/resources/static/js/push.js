@@ -20,8 +20,8 @@ function getWebSocketHead(){
 function init() {
 
     var pushReq = {
-        "appId": "2c910b266493103c0164931335070000",
-        "appKey": "527fe98c70844eb8ac3fa6d0549e3b56",
+        "appId": "2c9123aa64a1a0a70164a1a182150001",
+        "appKey": "73764884cdd44dfbb9dec43ac76dcd7e",
         "platform": "ALL",
         "audienceType": "ALIAS",
         "audiences": ["testuser1"],
