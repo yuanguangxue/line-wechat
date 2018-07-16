@@ -1,13 +1,11 @@
 package com.hp.service;
 
 
+import com.hp.config.PushServerConfig;
 import com.hp.enums.AudienceType;
 import com.hp.enums.PlatformType;
 import com.hp.exception.PushParameterException;
-import com.hp.model.Application;
-import com.hp.model.PushMsg;
-import com.hp.model.PushRequest;
-import com.hp.model.UserDevice;
+import com.hp.model.*;
 import com.hp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,6 +50,12 @@ public class PushRequestService {
     @Autowired
     private AppRepository appRepository;
 
+    @Autowired
+    private PushServerConfig pushServerConfig;
+
+    @Autowired
+    private LineMessageService lineMessageService;
+
     public void saveRequest(PushRequest req) {
         req.setCreateTime(new Date());
         req.mask();
@@ -78,6 +82,20 @@ public class PushRequestService {
             pushMsgByPool(orgiPushRequest, devicePage);
         }
         this.saveRequest(pushRequest);
+    }
+
+    public void pushLineMsg(){
+        PushRequest pushRequest = new PushRequest();
+        pushRequest.setAppId(pushServerConfig.getAppId());
+        pushRequest.setAudienceType(AudienceType.ALIAS);
+        List<LineMessage> lineMessageList = lineMessageService.findAll(new HashMap<>());
+        for (LineMessage lineMessage : lineMessageList) {
+            pushRequest.setCreateTime(new Date());
+            pushRequest.setAlert(lineMessage.getText());
+            pushRequest.setSmsMessage(lineMessage.getText());
+            pushRequest.setSender(lineMessage.getUserId());
+            push(pushRequest);
+        }
     }
 
     private void pushMsgByPool(PushRequest orgiPushRequest, Page<UserDevice> devicePage) {

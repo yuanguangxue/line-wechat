@@ -62,3 +62,5 @@ push-server:
   mode: BOTH # 在线和离线推送服务器(ONLINE,OFFLINE)
   env: DEV #开发或正式
   url: localhost:8080
+  app-id: 4028818164a192740164a197386f0001
+  app-key: 82bd3a9874bf482cb4dff11bb7fe71a7

@@ -3,6 +3,10 @@ package com.hp;
 
 
 import com.google.common.annotations.VisibleForTesting;
+import com.hp.model.LineMessage;
+import com.hp.service.LineMessageService;
+import com.hp.service.PushRequestService;
+import com.hp.util.LineUtils;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
@@ -30,6 +34,12 @@ public class Application {
     private final PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory;
 
     @Autowired
+    private LineMessageService lineMessageService;
+
+    @Autowired
+    private PushRequestService pushRequestService;
+
+    @Autowired
     public Application(PushByReturnValueConsumer.PushFactory returnValueConsumerPushFactory){
         this.returnValueConsumerPushFactory = returnValueConsumerPushFactory;
     }
@@ -46,10 +56,15 @@ public class Application {
     @SuppressWarnings("unchecked")
     private void dispatchInternal(final Event event) {
         if(event instanceof MessageEvent){
-            final String originalMessageText = ((MessageEvent<TextMessageContent>)event).getMessage().getText();
-            returnValueConsumerPushFactory.createForEvent(event)
-                    .accept(new TextMessage(originalMessageText));
+            LineMessage lineMessage = LineUtils.messageEventToEntity((MessageEvent)event);
+            lineMessageService.save(lineMessage);
+            pushRequestService.pushLineMsg();
         }
+    }
+
+    private void sendTextMessage(Event event,String originalMessageText){
+        returnValueConsumerPushFactory.createForEvent(event)
+                .accept(new TextMessage(originalMessageText));
     }
 
     @EventMapping

@@ -2,6 +2,7 @@ package com.hp.web;
 
 import com.hp.exception.PushParameterException;
 import com.hp.model.*;
+import com.hp.service.LineMessageService;
 import com.hp.service.PushRequestService;
 import com.hp.service.UserDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class PushController {
 
     @Autowired
     private MessageSource messageSource;
+
+    @Autowired
+    private LineMessageService lineMessageService;
 
     /**
      * 发送消息
@@ -111,5 +115,10 @@ public class PushController {
     @RequestMapping(value = "/applicationList")
     List<Application> applicationList(){
         return pushRequestService.applicationList();
+    }
+
+    @RequestMapping(value = "/lineMessageList")
+    List<LineMessage> lineMessageList(){
+        return lineMessageService.findAll();
     }
 }

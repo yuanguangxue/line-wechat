@@ -16,12 +16,13 @@ function getWebSocketHead(){
     }
     return 'ws://'
 }
-
+const appId = document.getElementById("appId").value;
+const appKey = document.getElementById("appKey").value;
 function init() {
 
     var pushReq = {
-        "appId": "2c9123aa64a1a0a70164a1a182150001",
-        "appKey": "73764884cdd44dfbb9dec43ac76dcd7e",
+        "appId": appId,
+        "appKey": appKey,
         "platform": "ALL",
         "audienceType": "ALIAS",
         "audiences": ["testuser1"],
@@ -72,7 +73,7 @@ function reg(i) {
         },
         body: JSON.stringify({
             "alias": "testuser"+i,
-            "appId": "2c9123aa64a1a0a70164a1a182150001",
+            "appId": appId,
             "platform": "ANDROID",
             "nativeToken": "andToken0011"+i,
             "tag": ["tag1","sz"]
