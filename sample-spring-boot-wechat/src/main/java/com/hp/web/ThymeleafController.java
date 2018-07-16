@@ -22,4 +22,12 @@ public class ThymeleafController {
         model.setViewName("push");
         return model;
     }
+
+    @RequestMapping("/webchat")
+    public ModelAndView webchat(ModelAndView model){
+        log.info("pushServerConfig : {}", pushServerConfig);
+        model.addObject("pushServerConfig",pushServerConfig);
+        model.setViewName("webchat");
+        return model;
+    }
 }
