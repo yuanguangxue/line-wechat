@@ -147,13 +147,20 @@ $(function () {
     }
 
     function sendMsgStr(str){
-       var html = juicer(sendMsgTpl,{text:str});
+       var html = juicer(sendMsgTpl,{
+            text:str,
+            avatar:'https://obs.line-scdn.net/0hytw49WslJltKTQmaOhZZDHQQLTl5LzhQaCg9PjoYeD5uKmZaJis8ODwjeGM1KmkMcC0sPGgZeztlKjM'
+       });
        $("#messageList").append(html);
        resetMessageAreaButton();
     }
 
     function getMsgStr(str){
-        var html = juicer(getMsgTpl,{text:str});
+        var avatar = $(".panel>ul>li>a.current").data("avatar");
+        var html = juicer(getMsgTpl,{
+            text:str,
+            avatar:avatar
+        });
          $("#messageList").append(html);
          resetMessageAreaButton();
     }

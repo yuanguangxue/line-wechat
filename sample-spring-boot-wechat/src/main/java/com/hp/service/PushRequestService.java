@@ -99,6 +99,8 @@ public class PushRequestService {
             pushRequest.setSender(lineMessage.getUserId());
             pushRequest.setTarget("me");
             push(pushRequest);
+            lineMessage.setStatus("1");
+            lineMessageService.save(lineMessage);
         }
     }
 
