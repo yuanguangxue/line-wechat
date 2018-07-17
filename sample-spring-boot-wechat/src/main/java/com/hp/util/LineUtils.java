@@ -4,6 +4,7 @@ package com.hp.util;
 import com.hp.model.LineMessage;
 import com.hp.model.LineUserProfile;
 import com.hp.model.PushMsg;
+import com.hp.model.SenderLineMessage;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.MessageContent;
@@ -38,5 +39,14 @@ public class LineUtils {
             return null;
         }
         return new PushMessage(pushMsg.getTarget(), new TextMessage(pushMsg.getExtra()));
+    }
+
+    public static SenderLineMessage senderLineMessageToEntity(PushMsg pushMsg){
+        SenderLineMessage senderLineMessage = new SenderLineMessage();
+        senderLineMessage.setMsgType("text");
+        senderLineMessage.setStatus("1");
+        senderLineMessage.setTimestamp(System.currentTimeMillis());
+        senderLineMessage.setUserId(pushMsg.getTarget());
+        return senderLineMessage;
     }
 }

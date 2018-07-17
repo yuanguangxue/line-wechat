@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.enums.PlatformType;
 import com.hp.enums.PushMsgType;
-import com.hp.model.PushCertification;
-import com.hp.model.PushMsg;
-import com.hp.model.PushRequest;
-import com.hp.model.UserDevice;
+import com.hp.model.*;
 import com.hp.repository.CertificationRepository;
 import com.hp.repository.PushMsgRepository;
+import com.hp.repository.PushRequestRepository;
 import com.hp.util.LineUtils;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.PushMessage;
@@ -21,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -58,6 +57,15 @@ public class PushMsgHandler {
 
     @Autowired
     private LineBotProperties lineBotProperties;
+
+    @Autowired
+    private LineMessageService lineMessageService;
+
+    @Autowired
+    private SenderLineMessageService senderLineMessageService;
+
+    @Autowired
+    private PushRequestRepository pushRequestRepository;
     /**
      * 推送消息
      * @param pushRequest
@@ -65,14 +73,12 @@ public class PushMsgHandler {
     @SuppressWarnings("uncheck")
     public synchronized void pushMsg(PushRequest pushRequest, Iterable<UserDevice> devices) {
         PushMsg pushMsg = new PushMsg(pushRequest);
-
         List<String> offlineIosTokens = new ArrayList<>();
         for (UserDevice device : devices) {
             setPushMsgExpire(pushRequest,pushMsg);
             pushMsg.setAudienceDeviceId(device.getId());
             pushMsg.setCreatedAt(new Date());
             saveMsgForConfirm(pushRequest, pushMsg);
-
             //发送到客户端的消息不需要audienceDeviceId和expireAt
             pushMsg.setAudienceDeviceId(null);
             pushMsg.setExpireAt(null);
@@ -126,6 +132,26 @@ public class PushMsgHandler {
                 try {
                     BotApiResponse botApiResponse = client.pushMessage(pushMessage).get();
                     log.info("botApiResponse : {}", botApiResponse);
+                    //发送成功把已发送的消息存储好
+                    SenderLineMessage senderLineMessage = LineUtils.senderLineMessageToEntity(pushMsg);
+                    senderLineMessageService.save(senderLineMessage);
+                    if(!StringUtils.isEmpty(senderLineMessage.getId())){
+                        //修改
+                        PushRequest dbPushRequest = pushRequestRepository.findBySenderUid(pushMsg.getRequestId());
+                        dbPushRequest.setTenantCode(senderLineMessage.getId());
+                        pushRequestRepository.save(dbPushRequest);
+                    }
+                }catch (Exception e){
+                    log.error("error : ",e);
+                }
+            }
+        }else if(pushMsg.getPushMsgType() == PushMsgType.LINE){
+            //从line 发送过来的代码 需要把lineMessage 状态设置为 1
+            if(!StringUtils.isEmpty(pushMsg.getTenantCode())){
+                try {
+                    LineMessage lineMessage = lineMessageService.findOne(pushMsg.getTenantCode());
+                    lineMessage.setStatus("1");
+                    lineMessageService.save(lineMessage);
                 }catch (Exception e){
                     log.error("error : ",e);
                 }

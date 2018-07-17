@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PushRequestRepository extends JpaRepository<PushRequest,String>,JpaSpecificationExecutor<PushRequest> {
 
+    PushRequest findBySenderUid(String senderUid);
+
 }

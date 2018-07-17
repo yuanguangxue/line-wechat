@@ -30,6 +30,10 @@ public class LineMessageService {
         return lineMessageRepository.findAll();
     }
 
+    public LineMessage findOne(String id){
+        return lineMessageRepository.findOne(id);
+    }
+
     public List<LineMessage> findAll(Map<String,Object> queryParams){
         return lineMessageRepository.findAll(getQuery(queryParams));
     }

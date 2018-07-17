@@ -52,6 +52,7 @@ public class PushRequest implements Serializable {
     @Enumerated(EnumType.STRING)
     private PlatformType sendDevice;
     private String target;
+    private String senderUid;
 
     public String getId() {
         return id;
@@ -223,6 +224,14 @@ public class PushRequest implements Serializable {
 
     public void setTarget(String target) {
         this.target = target;
+    }
+
+    public String getSenderUid() {
+        return senderUid;
+    }
+
+    public void setSenderUid(String senderUid) {
+        this.senderUid = senderUid;
     }
 
     /**

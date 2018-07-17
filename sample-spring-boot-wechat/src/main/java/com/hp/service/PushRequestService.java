@@ -15,10 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -64,16 +61,20 @@ public class PushRequestService {
         pushRequestRepository.save(req);
     }
 
+    private String generateRandomKey() {
+        return UUID.randomUUID().toString().replaceAll("-","");
+    }
+
     /**
      * 推送消息
      * @param pushRequest
      */
     public void push(PushRequest pushRequest) {
-
         //分页获取受众
         Map<String,Object> params = getQueryParams(pushRequest);
+        pushRequest.setSenderUid(generateRandomKey());
         PushRequest orgiPushRequest = pushRequest.cloneMe();
-
+        this.saveRequest(pushRequest);
         Pageable pageRequest = new PageRequest(0,200);
         Page<UserDevice> devicePage = deviceRepositoryCustom.findAll(params,pageRequest);
         pushMsgByPool(orgiPushRequest, devicePage);
@@ -82,7 +83,6 @@ public class PushRequestService {
             devicePage = deviceRepositoryCustom.findAll(params, pageRequest);
             pushMsgByPool(orgiPushRequest, devicePage);
         }
-        this.saveRequest(pushRequest);
     }
 
     public synchronized void pushLineMsg(){
@@ -98,9 +98,8 @@ public class PushRequestService {
             pushRequest.setExtra(lineMessage.getText());
             pushRequest.setSender(lineMessage.getUserId());
             pushRequest.setTarget("me");
+            pushRequest.setTenantCode(lineMessage.getId());
             push(pushRequest);
-            lineMessage.setStatus("1");
-            lineMessageService.save(lineMessage);
         }
     }
 
