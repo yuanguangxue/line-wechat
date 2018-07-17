@@ -288,6 +288,7 @@ $(function () {
              console.info(res);
              return res.json();
          }).then(function(data){
+             $("#messageList").empty();
              if($.isArray(data)){
                 $.each(data,function(i,obj){
                     var time = "";
