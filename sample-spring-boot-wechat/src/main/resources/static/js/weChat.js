@@ -288,7 +288,20 @@ $(function () {
              console.info(res);
              return res.json();
          }).then(function(data){
-             console.info(data);
+             if($.isArray(data)){
+                $.each(data,function(i,obj){
+                    var time = "";
+                    if(obj.createdAt !== null){
+                        var date = new Date(obj.createdAt);
+                        time = dateFtt("yyyy-MM-dd hh:mm",date);
+                    }
+                    if(obj.target === 'me'){
+                        getMsgStr(obj.extra,time);
+                    }else{
+                        sendMsgStr(obj.extra,time);
+                    }
+                });
+             }
              if(typeof callback === "function"){
                 callback(data);
              }
