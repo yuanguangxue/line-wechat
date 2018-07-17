@@ -131,7 +131,7 @@ $(function () {
              "audienceType": "ALIAS",
              "audiences": ["testuser1"],
              "extra": str,
-             "alert": str,
+             "alert": "send line message",
              "sound": "default",
              "pushMsgType":"LINE",
              "badge": 1,
