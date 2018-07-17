@@ -286,8 +286,11 @@ $(function () {
             })
          }).then(function(res) {
              console.info(res);
+             return res.json();
+         }).then(function(data){
+             console.info(data);
              if(typeof callback === "function"){
-                callback(res);
+                callback(data);
              }
          });
     }
