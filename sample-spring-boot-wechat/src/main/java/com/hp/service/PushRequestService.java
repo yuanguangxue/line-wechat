@@ -165,16 +165,21 @@ public class PushRequestService {
         //获得今天聊天的历史记录
         List<PushRequest> list = pushRequestRepository.findAll((root, query, cb) -> {
             Predicate statusPredicate = cb.equal(root.get("status"),"1");
-            Predicate tenantCodePredicate = cb.isNotNull(root.get("tenantCode"));
+            Predicate tenantCodePredicate = cb.and(
+                cb.isNotNull(root.get("tenantCode")),
+                cb.notEqual(root.get("tenantCode"),"")
+            );
             Predicate userIdPredicate = cb.equal(root.get("target"),userId);
             Predicate senderPredicate = cb.equal(root.get("sender"),userId);
             Predicate predicate = cb.or(userIdPredicate,senderPredicate);
             Calendar calendar = Calendar.getInstance();
             int day = calendar.get(Calendar.DATE);
             calendar.set(Calendar.DATE, day - 1);
-            Predicate createTimePredicate = cb.greaterThan(root.get("createTime"),calendar.getTime());
-            return cb.and(statusPredicate,predicate,createTimePredicate,tenantCodePredicate);
+            Predicate createTimePredicate = cb.greaterThanOrEqualTo(root.get("createTime"),calendar.getTime());
+            return cb.and(statusPredicate,predicate,tenantCodePredicate,createTimePredicate);
         },sort);
+        log.info("PushRequest list size is {} ",list.size());
+        log.info("userId is {} ",userId);
         for (PushRequest pushRequest : list){
             PushMsg pushMsg = new PushMsg(pushRequest);
             //获取相关消息

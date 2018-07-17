@@ -139,8 +139,8 @@ public class PushController {
     }
 
     @RequestMapping(value = "/loadHistoryPushMsg")
-    List<PushMsg> loadHistoryPushMsg(@NotNull String userId){
-        return pushRequestService.getHistoryPushMsg(userId);
+    List<PushMsg> loadHistoryPushMsg(@Valid @RequestBody ValidateLineInfo validateLineInfo,BindingResult bindResult){
+        return pushRequestService.getHistoryPushMsg(validateLineInfo.getUserId());
     }
 
 }

@@ -1,8 +1,10 @@
 package com.hp.web;
 
 
+import com.hp.model.LineMessage;
 import com.hp.model.PushRequest;
 import com.hp.model.UserDevice;
+import com.hp.model.ValidateLineInfo;
 import com.hp.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +25,9 @@ public class PushValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return UserDevice.class.equals(clazz) || PushRequest.class.equals(clazz);
+        return UserDevice.class.equals(clazz)
+                || PushRequest.class.equals(clazz)
+                || ValidateLineInfo.class.equals(clazz);
     }
 
     @Override
@@ -46,6 +50,14 @@ public class PushValidator implements Validator {
             ValidationUtils.rejectIfEmptyOrWhitespace(e, "alert", "field.required", new String[]{"alert"});
             if (!e.hasErrors()) {
                 PushRequest req = (PushRequest)obj;
+                String appId = req.getAppId();
+                String appKey = req.getAppKey();
+                appService.validate(appId,appKey);
+            }
+        }else if(obj instanceof ValidateLineInfo){
+            ValidationUtils.rejectIfEmptyOrWhitespace(e, "appKey", "field.required", new String[]{"appKey"});
+            if (!e.hasErrors()) {
+                ValidateLineInfo req = (ValidateLineInfo)obj;
                 String appId = req.getAppId();
                 String appKey = req.getAppKey();
                 appService.validate(appId,appKey);

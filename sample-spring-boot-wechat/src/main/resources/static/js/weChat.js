@@ -278,7 +278,12 @@ $(function () {
             headers: {
                "Content-Type": "application/json"
             },
-            body: "userId="+userId
+            body: JSON.stringify({
+                 "appId": appId,
+                 "platform": "ALL",
+                 "appKey": appKey,
+                 "userId": userId
+            })
          }).then(function(res) {
              console.info(res);
              if(typeof callback === "function"){
