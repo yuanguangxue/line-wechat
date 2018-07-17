@@ -6,5 +6,6 @@ package com.hp.enums;
  */
 public enum PushMsgType {
     MSG,//普通消息
-    CMD //特殊指令
+    CMD, //特殊指令
+    LINE//line消息
 }
