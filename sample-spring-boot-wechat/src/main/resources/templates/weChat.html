@@ -19,7 +19,8 @@
                 <input type="button" id="link" value="连接" />
                 <label id="connectionLabel"></label>
             </div>
-            <ul th:each="user,userStat : userList">
+
+            <ul th:unless="${#lists.isEmpty(userList)}" th:each="user,userStat : userList">
                 <li th:if=" ${userStat.index} eq '0'">
                     <a href="javascript:;" class="current" th:text="*{userList[__${userStat.index}__].displayName}"
                        th:attr="data-id=*{userList[__${userStat.index}__].userId},data-avatar=*{userList[__${userStat.index}__].pictureUrl}">王五</a>
