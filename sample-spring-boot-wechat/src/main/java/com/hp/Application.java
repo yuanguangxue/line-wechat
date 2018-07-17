@@ -68,7 +68,7 @@ public class Application {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked","rawtypes"})
     private void dispatchInternal(final Event event) throws Exception {
         if(event instanceof MessageEvent){
             MessageEvent messageEvent = (MessageEvent)event;
