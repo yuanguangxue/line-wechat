@@ -82,7 +82,7 @@ public class PushMsgHandler {
             //发送到客户端的消息不需要audienceDeviceId和expireAt
             pushMsg.setAudienceDeviceId(null);
             pushMsg.setExpireAt(null);
-            pushMsg.setCreatedAt(null);
+            //pushMsg.setCreatedAt(null);
             String jsonMsg = null;
             try {
                 jsonMsg = objectMapper.writeValueAsString(pushMsg);
