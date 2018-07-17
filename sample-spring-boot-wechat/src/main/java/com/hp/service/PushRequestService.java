@@ -4,6 +4,7 @@ package com.hp.service;
 import com.hp.config.PushServerConfig;
 import com.hp.enums.AudienceType;
 import com.hp.enums.PlatformType;
+import com.hp.enums.PushMsgType;
 import com.hp.exception.PushParameterException;
 import com.hp.model.*;
 import com.hp.repository.*;
@@ -84,10 +85,11 @@ public class PushRequestService {
         this.saveRequest(pushRequest);
     }
 
-    public void pushLineMsg(){
+    public synchronized void pushLineMsg(){
         PushRequest pushRequest = new PushRequest();
         pushRequest.setAppId(pushServerConfig.getAppId());
         pushRequest.setAudienceType(AudienceType.ALIAS);
+        pushRequest.setPushMsgType(PushMsgType.LINE);
         List<LineMessage> lineMessageList = lineMessageService.findAll(new HashMap<>());
         for (LineMessage lineMessage : lineMessageList) {
             pushRequest.setCreateTime(new Date());
