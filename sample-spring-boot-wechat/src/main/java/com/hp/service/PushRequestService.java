@@ -8,13 +8,23 @@ import com.hp.enums.PushMsgType;
 import com.hp.exception.PushParameterException;
 import com.hp.model.*;
 import com.hp.repository.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,6 +34,7 @@ import java.util.concurrent.Executors;
  *
  * Created by yaoyasong on 2016/5/3.
  */
+@Slf4j
 @Service
 public class PushRequestService {
 
@@ -53,6 +64,9 @@ public class PushRequestService {
 
     @Autowired
     private LineMessageService lineMessageService;
+
+    @Autowired
+    private SenderLineMessageService senderLineMessageService;
 
     public void saveRequest(PushRequest req) {
         req.setCreateTime(new Date());
@@ -142,5 +156,51 @@ public class PushRequestService {
 
     public List<Application>  applicationList(){
         return appRepository.findAll();
+    }
+
+    public List<PushMsg> getHistoryPushMsg(final String userId){
+        List<PushMsg> msgList = new ArrayList<>();
+        Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC,"createTime"));
+
+        //获得今天聊天的历史记录
+        List<PushRequest> list = pushRequestRepository.findAll((root, query, cb) -> {
+            Predicate statusPredicate = cb.equal(root.get("status"),"1");
+            Predicate tenantCodePredicate = cb.isNotNull(root.get("tenantCode"));
+            Predicate userIdPredicate = cb.equal(root.get("target"),userId);
+            Predicate senderPredicate = cb.equal(root.get("sender"),userId);
+            Predicate predicate = cb.or(userIdPredicate,senderPredicate);
+            Calendar calendar = Calendar.getInstance();
+            int day = calendar.get(Calendar.DATE);
+            calendar.set(Calendar.DATE, day - 1);
+            Predicate createTimePredicate = cb.greaterThan(root.get("createTime"),calendar.getTime());
+            return cb.and(statusPredicate,predicate,createTimePredicate,tenantCodePredicate);
+        },sort);
+        for (PushRequest pushRequest : list){
+            PushMsg pushMsg = new PushMsg(pushRequest);
+            //获取相关消息
+            if(!StringUtils.isEmpty(pushMsg.getTenantCode())){
+                //发给我的信息存在 LineMessage 中
+                if(pushMsg.getTarget().equals("me")){
+                    try {
+                        LineMessage lineMessage = lineMessageService.findOne(pushMsg.getTenantCode());
+                        pushMsg.setCreatedAt(new Date(lineMessage.getTimestamp()));
+                        pushMsg.setExtra(lineMessage.getText());
+                    }catch (Exception e){
+                        log.error("error :",e);
+                    }
+                }else {
+                    //我发出去的信息存在 SenderLineMessage 中
+                    try {
+                        SenderLineMessage senderLineMessage = senderLineMessageService.findOne(pushMsg.getTenantCode());
+                        pushMsg.setCreatedAt(new Date(senderLineMessage.getTimestamp()));
+                        pushMsg.setExtra(senderLineMessage.getText());
+                    }catch (Exception e){
+                        log.error("error :",e);
+                    }
+                }
+            }
+            msgList.add(pushMsg);
+        }
+        return msgList;
     }
 }

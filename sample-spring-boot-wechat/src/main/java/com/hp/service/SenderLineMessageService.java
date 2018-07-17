@@ -17,6 +17,10 @@ public class SenderLineMessageService {
         senderLineMessageRepository.save(senderLineMessage);
     }
 
+    public SenderLineMessage findOne(String id){
+        return senderLineMessageRepository.findOne(id);
+    }
+
     public List<SenderLineMessage> findAll(){
         return senderLineMessageRepository.findAll();
     }

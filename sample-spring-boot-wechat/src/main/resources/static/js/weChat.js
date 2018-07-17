@@ -107,8 +107,11 @@ $(function () {
     });
 
     $(".panel > ul > li > a").on ("dblclick",function(){
-        $(this).addClass("current")
-        .parent().siblings("li").find("a").removeClass("current");
+        var that  = this;
+        loadHistoryPushMsg(userId,function(res){
+          $(that).addClass("current")
+                .parent().siblings("li").find("a").removeClass("current");
+        });
     });
 
     $("#messageList").on("click",function(){
@@ -235,5 +238,20 @@ $(function () {
     $("#link").on("click",function(){
         init();
     });
+
+    function loadHistoryPushMsg(userId,callback){
+         fetch(getHTTPHead() + getServiceUrl() + "/msgpush/loadHistoryPushMsg",{
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json"
+            },
+            body: "userId="+userId
+         }).then(function(res) {
+             console.info(res);
+             if(typeof callback === "function"){
+                callback(res);
+             }
+         });
+    }
 });
 

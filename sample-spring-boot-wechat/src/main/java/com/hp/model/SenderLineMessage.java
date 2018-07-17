@@ -22,6 +22,8 @@ public class SenderLineMessage {
 
     private String status = "0";
 
+    private String text;
+
     public String getId() {
         return id;
     }
@@ -60,5 +62,13 @@ public class SenderLineMessage {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

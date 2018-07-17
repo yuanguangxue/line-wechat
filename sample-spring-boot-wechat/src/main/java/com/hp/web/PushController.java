@@ -16,6 +16,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -137,5 +138,9 @@ public class PushController {
         return Result.success("message is send").toJson();
     }
 
+    @RequestMapping(value = "/loadHistoryPushMsg")
+    List<PushMsg> loadHistoryPushMsg(@NotNull String userId){
+        return pushRequestService.getHistoryPushMsg(userId);
+    }
 
 }

@@ -47,6 +47,7 @@ public class LineUtils {
         senderLineMessage.setStatus("1");
         senderLineMessage.setTimestamp(System.currentTimeMillis());
         senderLineMessage.setUserId(pushMsg.getTarget());
+        senderLineMessage.setText(pushMsg.getExtra());
         return senderLineMessage;
     }
 }
