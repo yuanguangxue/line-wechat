@@ -15,9 +15,9 @@
 <div class="main">
     <div class="main_inner clearfix">
         <div class="panel">
-            <div style="width:100%;height:30px;">
-                <input type="button" id="link" value="连接" />
-                <label id="connectionLabel"></label>
+            <div>
+                <input style="margin-left:15px" type="button" id="link" value="断线重连" />
+                <div style="margin-left:15px;"><label>状态:</label><label id="connectionLabel"></label></div>
             </div>
             <ul th:unless="${#lists.isEmpty(userList)}">
                 <li th:each="user,userStat : ${userList}">

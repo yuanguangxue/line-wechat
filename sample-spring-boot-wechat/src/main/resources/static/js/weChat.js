@@ -108,9 +108,11 @@ $(function () {
 
     $(".panel > ul > li > a").on ("dblclick",function(){
         var that  = this;
+        $(that).addClass("current")
+                        .parent().siblings("li").find("a").removeClass("current");
+        var userId = $(".panel>ul>li>a.current").data("id");
         loadHistoryPushMsg(userId,function(res){
-          $(that).addClass("current")
-                .parent().siblings("li").find("a").removeClass("current");
+
         });
     });
 
@@ -149,19 +151,21 @@ $(function () {
          });
     }
 
-    function sendMsgStr(str){
+    function sendMsgStr(str,time){
        var html = juicer(sendMsgTpl,{
             text:str,
+            time:time,
             avatar:'https://obs.line-scdn.net/0hytw49WslJltKTQmaOhZZDHQQLTl5LzhQaCg9PjoYeD5uKmZaJis8ODwjeGM1KmkMcC0sPGgZeztlKjM'
        });
        $("#messageList").append(html);
        resetMessageAreaButton();
     }
 
-    function getMsgStr(str){
+    function getMsgStr(str,time){
         var avatar = $(".panel>ul>li>a.current").data("avatar");
         var html = juicer(getMsgTpl,{
             text:str,
+            time:time,
             avatar:avatar
         });
          $("#messageList").append(html);
@@ -178,7 +182,10 @@ $(function () {
     }
 
     function init(){
-        reg();
+        var userId = $(".panel>ul>li>a.current").data("id");
+        loadHistoryPushMsg(userId,function(res){
+            reg();
+        });
     }
 
     function reg(i) {
@@ -208,6 +215,25 @@ $(function () {
         });
     }
 
+    function dateFtt(fmt,date)
+    { //author: meizz
+      var o = {
+        "M+" : date.getMonth()+1,                 //月份
+        "d+" : date.getDate(),                    //日
+        "h+" : date.getHours(),                   //小时
+        "m+" : date.getMinutes(),                 //分
+        "s+" : date.getSeconds(),                 //秒
+        "q+" : Math.floor((date.getMonth()+3)/3), //季度
+        "S"  : date.getMilliseconds()             //毫秒
+      };
+      if(/(y+)/.test(fmt))
+        fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
+      for(var k in o)
+        if(new RegExp("("+ k +")").test(fmt))
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+      return fmt;
+    }
+
     function wsConn(deviceId) {
 
         var ws = new WebSocket(getWebSocketHead() + getServiceUrl() + "/msgpush.ws?deviceId="+deviceId);
@@ -215,19 +241,24 @@ $(function () {
         ws.onmessage = function(evt) {
             console.info(evt.data);
             var obj = eval('(' + evt.data + ')');
+            var time = "";
+            if(obj.createdAt !== null){
+                var date = new Date(obj.createdAt);
+                time = dateFtt("yyyy-MM-dd hh:mm",date);
+            }
             if(obj.target === 'me'){
-                getMsgStr(obj.extra);
+                getMsgStr(obj.extra,time);
             }else{
-                sendMsgStr(obj.extra);
+                sendMsgStr(obj.extra,time);
             }
         };
 
         ws.onclose = function(evt) {
-            connectionLabel.innerHTML = "DisConnected";
+            connectionLabel.innerHTML = "离线";
         };
 
         ws.onopen = function(evt) {
-            connectionLabel.innerHTML = "Connected";
+            connectionLabel.innerHTML = "在线";
         };
 
         ws.onerror = function(event) {
@@ -238,6 +269,8 @@ $(function () {
     $("#link").on("click",function(){
         init();
     });
+
+    init();
 
     function loadHistoryPushMsg(userId,callback){
          fetch(getHTTPHead() + getServiceUrl() + "/msgpush/loadHistoryPushMsg",{

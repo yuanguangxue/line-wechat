@@ -175,6 +175,11 @@ a.btn {
     background: #2e3238;
 }
 
+.panel > div {
+    width:100%;height:60px;
+    border-bottom: 1px solid #1b1818;
+}
+
 .panel ul {
   width: 100%;
   background: #fdfdfd;
