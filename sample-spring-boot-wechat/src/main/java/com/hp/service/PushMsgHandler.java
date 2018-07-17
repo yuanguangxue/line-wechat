@@ -3,12 +3,19 @@ package com.hp.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.enums.PlatformType;
+import com.hp.enums.PushMsgType;
 import com.hp.model.PushCertification;
 import com.hp.model.PushMsg;
 import com.hp.model.PushRequest;
 import com.hp.model.UserDevice;
 import com.hp.repository.CertificationRepository;
 import com.hp.repository.PushMsgRepository;
+import com.hp.util.LineUtils;
+import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.PushMessage;
+import com.linecorp.bot.model.response.BotApiResponse;
+import com.linecorp.bot.spring.boot.LineBotProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +37,9 @@ import java.util.List;
  * Created by yaoyasong on 2016/5/4.
  */
 @Service
+@Slf4j
 public class PushMsgHandler {
-    private static final Log log = LogFactory.getLog(PushMsgHandler.class);
+
 
     @Autowired
     private SessionManager sessionManager;
@@ -48,6 +56,8 @@ public class PushMsgHandler {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private LineBotProperties lineBotProperties;
     /**
      * 推送消息
      * @param pushRequest
@@ -94,6 +104,7 @@ public class PushMsgHandler {
                 }
             }
         }
+
         if (!CollectionUtils.isEmpty(offlineIosTokens)) {
             String appId = pushRequest.getAppId();
             PushCertification cert = certRepository.findByAppId(appId);
@@ -102,6 +113,22 @@ public class PushMsgHandler {
                         pushRequest.getAlert(),pushRequest.getSound(), pushRequest.getBadge());
             } else {
                 log.error("no cert file found for app: " + appId);
+            }
+        }
+        //如果为line消息 并且sender 为 me 则推送消息给 line
+        if (pushMsg.getPushMsgType() == PushMsgType.LINE
+                && "me".equals(pushMsg.getTarget())){
+            PushMessage pushMessage = LineUtils.pushMsgToLinePushMessage(pushMsg);
+            if(pushMessage!=null){
+                LineMessagingClient client = LineMessagingClient
+                        .builder(lineBotProperties.getChannelToken())
+                        .build();
+                try {
+                    BotApiResponse botApiResponse = client.pushMessage(pushMessage).get();
+                    log.info("botApiResponse : {}", botApiResponse);
+                }catch (Exception e){
+                    log.error("error : ",e);
+                }
             }
         }
     }

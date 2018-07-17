@@ -5,6 +5,8 @@ import com.hp.repository.LineUserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class LineUserProfileService {
 
@@ -17,5 +19,9 @@ public class LineUserProfileService {
 
     public void save(LineUserProfile lineUserProfile){
         lineUserProfileRepository.save(lineUserProfile);
+    }
+
+    public List<LineUserProfile> findAll(){
+        return lineUserProfileRepository.findAll();
     }
 }

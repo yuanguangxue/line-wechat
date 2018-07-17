@@ -38,8 +38,8 @@ public class PushRequest implements Serializable {
     @Enumerated(EnumType.STRING)
     private PushMsgType pushMsgType = PushMsgType.MSG;
     private String listenFlag = "NOTF";
-    @Transient
-    private Object extra;
+    //@Transient
+    private String extra;
     private String alert;
     private String sound;
     private Integer badge;
@@ -51,6 +51,7 @@ public class PushRequest implements Serializable {
     private String sender;
     @Enumerated(EnumType.STRING)
     private PlatformType sendDevice;
+    private String target;
 
     public String getId() {
         return id;
@@ -140,11 +141,11 @@ public class PushRequest implements Serializable {
         this.listenFlag = listenFlag;
     }
 
-    public Object getExtra() {
+    public String getExtra() {
         return extra;
     }
 
-    public void setExtra(Object extra) {
+    public void setExtra(String extra) {
         this.extra = extra;
     }
 
@@ -213,6 +214,15 @@ public class PushRequest implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 
     /**

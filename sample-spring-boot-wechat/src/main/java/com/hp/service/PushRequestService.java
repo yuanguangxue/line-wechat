@@ -93,9 +93,11 @@ public class PushRequestService {
         List<LineMessage> lineMessageList = lineMessageService.findAll(new HashMap<>());
         for (LineMessage lineMessage : lineMessageList) {
             pushRequest.setCreateTime(new Date());
-            pushRequest.setAlert(lineMessage.getText());
+            pushRequest.setAlert("line message");
             pushRequest.setSmsMessage(lineMessage.getText());
+            pushRequest.setExtra(lineMessage.getText());
             pushRequest.setSender(lineMessage.getUserId());
+            pushRequest.setTarget("me");
             push(pushRequest);
         }
     }

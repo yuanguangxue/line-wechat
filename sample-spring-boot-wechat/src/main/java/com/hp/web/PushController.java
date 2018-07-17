@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hp.exception.PushParameterException;
 import com.hp.model.*;
 import com.hp.service.LineMessageService;
+import com.hp.service.LineUserProfileService;
 import com.hp.service.PushRequestService;
 import com.hp.service.UserDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,8 @@ public class PushController {
     @Autowired
     private LineMessageService lineMessageService;
 
+    @Autowired
+    private LineUserProfileService lineUserProfileService;
     /**
      * 发送消息
      * @param pushRequest
@@ -123,9 +126,16 @@ public class PushController {
         return lineMessageService.findAll();
     }
 
+    @RequestMapping(value = "/lineUserProfileList")
+    List<LineUserProfile> lineUserProfileList(){
+        return lineUserProfileService.findAll();
+    }
+
     @RequestMapping(value = "/pushLineMsg")
     String pushLineMsg() throws JsonProcessingException {
         pushRequestService.pushLineMsg();
         return Result.success("message is send").toJson();
     }
+
+
 }

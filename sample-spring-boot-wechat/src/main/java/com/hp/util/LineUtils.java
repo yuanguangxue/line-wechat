@@ -3,12 +3,16 @@ package com.hp.util;
 
 import com.hp.model.LineMessage;
 import com.hp.model.LineUserProfile;
+import com.hp.model.PushMsg;
+import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.profile.UserProfileResponse;
 
 public class LineUtils {
+
     public static LineMessage messageEventToEntity(MessageEvent<? extends MessageContent> messageEvent){
         LineMessage lineMessage = new LineMessage();
         MessageContent messageContent = messageEvent.getMessage();
@@ -27,5 +31,12 @@ public class LineUtils {
         userProfile.setUserId(userProfile.getUserId());
         userProfile.setPictureUrl(userProfile.getPictureUrl());
         return userProfile;
+    }
+
+    public static PushMessage pushMsgToLinePushMessage(PushMsg pushMsg){
+        if(pushMsg.getTarget().equals("me")){
+            return null;
+        }
+        return new PushMessage(pushMsg.getTarget(), new TextMessage(pushMsg.getExtra()));
     }
 }

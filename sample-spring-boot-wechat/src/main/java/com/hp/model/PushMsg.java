@@ -31,8 +31,8 @@ public class PushMsg implements Serializable{
     /**
      * 消息内容
      */
-    @Transient
-    private Object extra;
+    //@Transient
+    private String extra;
     /**
      * 消息类型
      */
@@ -61,6 +61,8 @@ public class PushMsg implements Serializable{
      */
     private Date createdAt;
 
+    private String target;
+
     public PushMsg() {
     }
 
@@ -73,6 +75,7 @@ public class PushMsg implements Serializable{
         this.pushMsgType = pushRequest.getPushMsgType();
         this.listenFlag = pushRequest.getListenFlag();
         this.needConfirm = pushRequest.getNeedConfirm();
+        this.target = pushRequest.getTarget();
     }
 
     public String getId() {
@@ -107,11 +110,11 @@ public class PushMsg implements Serializable{
         this.alert = alert;
     }
 
-    public Object getExtra() {
+    public String getExtra() {
         return extra;
     }
 
-    public void setExtra(Object extra) {
+    public void setExtra(String extra) {
         this.extra = extra;
     }
 
@@ -161,5 +164,13 @@ public class PushMsg implements Serializable{
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 }

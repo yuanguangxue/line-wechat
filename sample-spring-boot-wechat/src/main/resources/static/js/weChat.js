@@ -118,12 +118,40 @@ $(function () {
     });
 
     function sendMsg(str) {
-        var html = juicer(sendMsgTpl,{text:str});
-        $("#messageList").append(html);
-        resetMessageAreaButton();
+         var msg = {
+             "appId": appId,
+             "appKey": appKey,
+             "platform": "ALL",
+             "audienceType": "ALIAS",
+             "audiences": ["testuser1"],
+             "extra": str,
+             "alert": str,
+             "sound": "default",
+             "pushMsgType":"LINE",
+             "badge": 1,
+             "smsMessage": str,
+             "sender" : "me",
+             "target": "zhangsan"
+         }
+
+         fetch(getHTTPHead() + getServiceUrl() + "/msgpush/send",{
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json"
+            },
+            body: JSON.stringify(msg)
+         }).then(function(res) {
+             console.info(res);
+         });
     }
 
-    function getMsg(str){
+    function sendMsgStr(str){
+       var html = juicer(sendMsgTpl,{text:str});
+       $("#messageList").append(html);
+       resetMessageAreaButton();
+    }
+
+    function getMsgStr(str){
         var html = juicer(getMsgTpl,{text:str});
          $("#messageList").append(html);
          resetMessageAreaButton();
@@ -164,7 +192,7 @@ $(function () {
                     wsConn(data.id);
                 });
             } else {
-                alert(res.statusText);
+                console.info(res);
             }
         });
     }
@@ -175,8 +203,13 @@ $(function () {
         var connectionLabel = document.getElementById("connectionLabel");
 
         ws.onmessage = function(evt) {
-            //writeMsg.value = evt.data;
-            getMsg(evt.data);
+            console.info(evt.data);
+            var obj = eval('(' + evt.data + ')');
+            if(obj.sender === 'me'){
+                sendMsgStr(obj.extra);
+            }else{
+                getMsgStr(obj.extra);
+            }
         };
 
         ws.onclose = function(evt) {

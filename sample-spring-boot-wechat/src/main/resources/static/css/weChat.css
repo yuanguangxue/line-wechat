@@ -169,7 +169,7 @@ a.btn {
 
 .panel {
     position: relative;
-    width: 100px;
+    width: 120px;
     height: 100%;
     float: left;
     background: #2e3238;
@@ -201,7 +201,19 @@ a.btn {
 .panel ul li a.current,.panel ul li a:hover {
     color: #00be00;
 }
-
+.panel div{
+    background: #fdfdfd;
+}
+.panel input {
+    font-size:12px;
+    font-weight: 700;
+    color: #444;
+}
+.panel label{
+    font-size:12px;
+    font-weight: 700;
+    color: #444;
+}
 /*信息*/
 .box {
     position: relative;

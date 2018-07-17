@@ -13,12 +13,12 @@
 <input type="hidden" id="appId" th:value="${pushServerConfig.appId}"/>
 <input type="hidden" id="appKey" th:value="${pushServerConfig.appKey}"/>
 <div class="main">
-    <div class="main_inner clearfix" style="height:30px;">
-        <input type="button" id="link" value="连接" />
-        <label id="connectionLabel"></label>
-    </div>
     <div class="main_inner clearfix">
         <div class="panel">
+            <div style="width:100%;height:30px;">
+                <input type="button" id="link" value="连接" />
+                <label id="connectionLabel"></label>
+            </div>
             <ul>
                 <li><a href="javascript:;" class="current">王五</a></li>
                 <li><a href="javascript:;">张三</a></li>
