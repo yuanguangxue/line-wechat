@@ -117,7 +117,7 @@ public class PushMsgHandler {
         }
         //如果为line消息 并且sender 为 me 则推送消息给 line
         if (pushMsg.getPushMsgType() == PushMsgType.LINE
-                && "me".equals(pushMsg.getTarget())){
+                && !"me".equals(pushMsg.getTarget())){
             PushMessage pushMessage = LineUtils.pushMsgToLinePushMessage(pushMsg);
             if(pushMessage!=null){
                 LineMessagingClient client = LineMessagingClient

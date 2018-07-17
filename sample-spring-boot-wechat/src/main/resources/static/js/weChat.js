@@ -118,6 +118,7 @@ $(function () {
     });
 
     function sendMsg(str) {
+         var userId = $(".panel>ul>li>a.current").data("id");
          var msg = {
              "appId": appId,
              "appKey": appKey,
@@ -131,7 +132,7 @@ $(function () {
              "badge": 1,
              "smsMessage": str,
              "sender" : "me",
-             "target": "zhangsan"
+             "target": userId
          }
 
          fetch(getHTTPHead() + getServiceUrl() + "/msgpush/send",{
@@ -201,14 +202,13 @@ $(function () {
 
         var ws = new WebSocket(getWebSocketHead() + getServiceUrl() + "/msgpush.ws?deviceId="+deviceId);
         var connectionLabel = document.getElementById("connectionLabel");
-
         ws.onmessage = function(evt) {
             console.info(evt.data);
             var obj = eval('(' + evt.data + ')');
-            if(obj.sender === 'me'){
-                sendMsgStr(obj.extra);
-            }else{
+            if(obj.target === 'me'){
                 getMsgStr(obj.extra);
+            }else{
+                sendMsgStr(obj.extra);
             }
         };
 

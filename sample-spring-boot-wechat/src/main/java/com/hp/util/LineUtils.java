@@ -27,9 +27,9 @@ public class LineUtils {
 
     public static LineUserProfile UserProfileResponseToEntity(UserProfileResponse userProfileResponse){
         LineUserProfile userProfile = new LineUserProfile();
-        userProfile.setDisplayName(userProfile.getDisplayName());
-        userProfile.setUserId(userProfile.getUserId());
-        userProfile.setPictureUrl(userProfile.getPictureUrl());
+        userProfile.setDisplayName(userProfileResponse.getDisplayName());
+        userProfile.setUserId(userProfileResponse.getUserId());
+        userProfile.setPictureUrl(userProfileResponse.getPictureUrl());
         return userProfile;
     }
 
