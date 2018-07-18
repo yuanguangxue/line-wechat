@@ -80,7 +80,7 @@ public class Application {
             if(lineUserProfile == null){
                 doSaveUserProfile(messageEvent.getTo());
             }
-            LineMessage lineMessage = LineUtils.messageEventToEntity(messageEvent);
+            LineMessage lineMessage = LineUtils.messageEventToEntity(messageEvent,lineBotProperties);
             lineMessageService.save(lineMessage);
             pushRequestService.pushLineMsg();
         }
