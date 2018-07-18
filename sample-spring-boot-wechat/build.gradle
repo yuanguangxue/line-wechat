@@ -2,8 +2,7 @@ apply plugin: 'org.springframework.boot'
 /*apply plugin: 'war'*/
 dependencies {
     compile project(':line-bot-spring-boot')
-    /*optional 'javax.servlet:javax.servlet-api'*/
-    //compile "org.springframework:springloaded:1.2.6.RELEASE"
+    compile project(':line-bot-cli')
     compile 'net.sourceforge.nekohtml:nekohtml:1.9.22'
     compile("org.springframework.boot:spring-boot-starter-web",
         "org.springframework.boot:spring-boot-starter-websocket",
