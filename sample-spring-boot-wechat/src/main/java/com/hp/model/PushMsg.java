@@ -65,6 +65,8 @@ public class PushMsg implements Serializable{
 
     private String requestId;
 
+    private String sender;
+
     public PushMsg() {
     }
 
@@ -80,6 +82,7 @@ public class PushMsg implements Serializable{
         this.target = pushRequest.getTarget();
         this.createdAt = pushRequest.getCreateTime();
         this.requestId = pushRequest.getSenderUid();
+        this.sender = pushRequest.getSender();
     }
 
     public String getId() {
@@ -184,5 +187,13 @@ public class PushMsg implements Serializable{
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 }

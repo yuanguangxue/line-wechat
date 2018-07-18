@@ -233,6 +233,26 @@ $(function () {
       return fmt;
     }
 
+    function addMessage(userId){
+        var ele = $(".panel>ul>li>a[data-id='"+userId+"']>.num");
+        if(ele.length > 0){
+            var text = ele.text();
+            try{
+                var num = parseInt(text) + 1;
+                ele.text(num + "").show();
+            }catch(e){
+                ele.text("1").show();
+            }
+        }
+    }
+
+    function cleanMessage(userId){
+        var ele = $(".panel>ul>li>a[data-id='"+userId+"']>.num");
+        if(ele.length > 0){
+            ele.text("0").hide();
+        }
+    }
+
     function wsConn(deviceId) {
 
         var ws; //websocket实例
@@ -261,10 +281,22 @@ $(function () {
                     var date = new Date(obj.createdAt);
                     time = dateFtt("yyyy-MM-dd hh:mm",date);
                 }
+                var userId = $(".panel>ul>li>a.current").data("id");
                 if(obj.target === 'me'){
-                    getMsgStr(obj.extra,time);
+                    if(obj.sender === userId){
+                       getMsgStr(obj.extra,time);
+                    }else{
+                       //执行其他消息弹出提示
+                       addMessage(obj.sender);
+                    }
                 }else{
-                    sendMsgStr(obj.extra,time);
+                    if(obj.target === userId){
+                        sendMsgStr(obj.extra,time);
+                    }else{
+                        //执行其他消息弹出
+                        console.info("add error message ...");
+                        console.info(obj);
+                    }
                 }
             };
 
@@ -274,7 +306,7 @@ $(function () {
             };
 
             ws.onopen = function(evt) {
-                connectionLabel.innerHTML = "在线";
+                 connectionLabel.innerHTML = "在线";
                  //心跳检测重置
                  heartCheck.reset().start();
             };
@@ -344,6 +376,7 @@ $(function () {
              return res.json();
          }).then(function(data){
              $("#messageList").empty();
+             cleanMessage(userId);
              if($.isArray(data)){
                 $.each(data,function(i,obj){
                     var time = "";

@@ -21,9 +21,9 @@
             </div>
             <ul th:unless="${#lists.isEmpty(userList)}">
                 <li th:each="user,userStat : ${userList}">
-                    <a th:if=" ${userStat.index} eq '0'" href="javascript:;" th:text="${user.displayName}" class="current"
+                    <a th:if=" ${userStat.index} eq '0'" href="javascript:;" th:utext="${user.displayName + '<span class=num>0</span>'}" class="current"
                        th:attr="data-id=${user.userId},data-avatar=${user.pictureUrl}">王五</a>
-                    <a th:if=" ${userStat.index} gt '0'" href="javascript:;" th:text="${user.displayName}"
+                    <a th:if=" ${userStat.index} gt '0'" href="javascript:;" th:utext="${user.displayName + '<span class=num>0</span>'}"
                        th:attr="data-id=${user.userId},data-avatar=${user.pictureUrl}">王五</a>
                 </li>
             </ul>
