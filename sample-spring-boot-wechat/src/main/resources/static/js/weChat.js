@@ -215,8 +215,7 @@ $(function () {
         });
     }
 
-    function dateFtt(fmt,date)
-    { //author: meizz
+    function dateFtt(fmt,date){
       var o = {
         "M+" : date.getMonth()+1,                 //月份
         "d+" : date.getDate(),                    //日
@@ -236,34 +235,90 @@ $(function () {
 
     function wsConn(deviceId) {
 
-        var ws = new WebSocket(getWebSocketHead() + getServiceUrl() + "/msgpush.ws?deviceId="+deviceId);
+        var ws; //websocket实例
+        var lockReconnect = false;//避免重复连接
+        var wsUrl = getWebSocketHead() + getServiceUrl() + "/msgpush.ws?deviceId="+deviceId;
         var connectionLabel = document.getElementById("connectionLabel");
-        ws.onmessage = function(evt) {
-            console.info(evt.data);
-            var obj = eval('(' + evt.data + ')');
-            var time = "";
-            if(obj.createdAt !== null){
-                var date = new Date(obj.createdAt);
-                time = dateFtt("yyyy-MM-dd hh:mm",date);
+
+        function createWebSocket(url) {
+            try {
+                ws = new WebSocket(url);
+                initEventHandle();
+            } catch (e) {
+                reconnect(url);
             }
-            if(obj.target === 'me'){
-                getMsgStr(obj.extra,time);
-            }else{
-                sendMsgStr(obj.extra,time);
+        }
+
+        function initEventHandle() {
+
+            ws.onmessage = function(evt) {
+                //拿到任何消息都说明当前连接是正常的
+                heartCheck.reset().start();
+                console.info(evt.data);
+                var obj = eval('(' + evt.data + ')');
+                var time = "";
+                if(obj.createdAt !== null){
+                    var date = new Date(obj.createdAt);
+                    time = dateFtt("yyyy-MM-dd hh:mm",date);
+                }
+                if(obj.target === 'me'){
+                    getMsgStr(obj.extra,time);
+                }else{
+                    sendMsgStr(obj.extra,time);
+                }
+            };
+
+            ws.onclose = function(evt) {
+                connectionLabel.innerHTML = "离线";
+                reconnect(wsUrl);
+            };
+
+            ws.onopen = function(evt) {
+                connectionLabel.innerHTML = "在线";
+                 //心跳检测重置
+                 heartCheck.reset().start();
+            };
+
+            ws.onerror = function(event) {
+                console.info("error ocoure");
+                reconnect(wsUrl);
+            };
+        }
+
+        function reconnect(url) {
+            if(lockReconnect) return;
+            lockReconnect = true;
+            //没连接上会一直重连，设置延迟避免请求过多
+            setTimeout(function () {
+                createWebSocket(url);
+                lockReconnect = false;
+            }, 2000);
+        }
+
+        //心跳检测
+        var heartCheck = {
+            timeout: 60000,//60秒
+            timeoutObj: null,
+            serverTimeoutObj: null,
+            reset: function(){
+                clearTimeout(this.timeoutObj);
+                clearTimeout(this.serverTimeoutObj);
+                return this;
+            },
+            start: function(){
+                var self = this;
+                this.timeoutObj = setTimeout(function(){
+                    //这里发送一个心跳，后端收到后，返回一个心跳消息，
+                    //onmessage拿到返回的心跳就说明连接正常
+                    ws.send("HeartBeat");
+                    self.serverTimeoutObj = setTimeout(function(){//如果超过一定时间还没重置，说明后端主动断开了
+                        ws.close();//如果onclose会执行reconnect，我们执行ws.close()就行了.如果直接执行reconnect 会触发onclose导致重连两次
+                    }, self.timeout)
+                }, this.timeout)
             }
-        };
+        }
 
-        ws.onclose = function(evt) {
-            connectionLabel.innerHTML = "离线";
-        };
-
-        ws.onopen = function(evt) {
-            connectionLabel.innerHTML = "在线";
-        };
-
-        ws.onerror = function(event) {
-            alert("error ocoure");
-        };
+        createWebSocket(wsUrl);
     }
 
     $("#link").on("click",function(){
