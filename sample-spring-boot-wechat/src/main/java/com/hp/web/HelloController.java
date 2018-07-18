@@ -56,15 +56,19 @@ public class HelloController {
     @RequestMapping("/createRichMenu")
     public String createRichMenu(@RequestBody String data) throws JsonProcessingException {
         log.info("data is {} ",data);
-        final LineMessagingClient client = LineMessagingClient
-                .builder(lineBotProperties.getChannelToken())
-                .build();
-        PayloadArguments arguments = new PayloadArguments();
-        arguments.setData(data);
-        PayloadProvider payloadProvider = new PayloadProvider(arguments);
-        RichMenuCreateCommand richMenuCreateCommand =
-                new RichMenuCreateCommand(client,payloadProvider);
-        richMenuCreateCommand.execute();
+        try {
+            final LineMessagingClient client = LineMessagingClient
+                    .builder(lineBotProperties.getChannelToken())
+                    .build();
+            PayloadArguments arguments = new PayloadArguments();
+            arguments.setData(data);
+            PayloadProvider payloadProvider = new PayloadProvider(arguments);
+            RichMenuCreateCommand richMenuCreateCommand =
+                    new RichMenuCreateCommand(client,payloadProvider);
+            richMenuCreateCommand.execute();
+        }catch (Exception e){
+            log.error("error ",e);
+        }
         return Result.success("message is send").toJson();
     }
 }
