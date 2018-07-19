@@ -5,10 +5,14 @@ import com.hp.model.HelloWorld;
 import com.hp.model.Result;
 import com.hp.model.UserInfo;
 import com.hp.repository.UserRepository;
-import com.linecorp.bot.cli.RichMenuCreateCommand;
+import com.linecorp.bot.cli.*;
+import com.linecorp.bot.cli.arguments.Arguments;
 import com.linecorp.bot.cli.arguments.PayloadArguments;
 import com.linecorp.bot.cli.arguments.PayloadProvider;
 import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.richmenu.RichMenuIdResponse;
+import com.linecorp.bot.model.richmenu.RichMenuListResponse;
+import com.linecorp.bot.model.richmenu.RichMenuResponse;
 import com.linecorp.bot.spring.boot.LineBotProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +21,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.util.concurrent.Futures.getUnchecked;
 
 /**
  * Created by yteng on 4/3/17.
@@ -34,6 +42,15 @@ public class HelloController {
     @Autowired
     private LineBotProperties lineBotProperties;
 
+    private LineMessagingClient client;
+
+    @PostConstruct
+    public void init(){
+        client = LineMessagingClient
+                .builder(lineBotProperties.getChannelToken())
+                .build();
+    }
+
     public HelloController(HelloWorld helloWorld) {
         this.helloWorld = helloWorld;
     }
@@ -45,9 +62,6 @@ public class HelloController {
         return helloWorld.hello();
     }
 
-
-
-
     @GetMapping("/anotherHelloWorld")
     public String anotherHello() {
         return helloWorld.anotherHello();
@@ -57,15 +71,80 @@ public class HelloController {
     public String createRichMenu(@RequestBody String data) throws JsonProcessingException {
         log.info("data is {} ",data);
         try {
-            final LineMessagingClient client = LineMessagingClient
-                    .builder(lineBotProperties.getChannelToken())
-                    .build();
+
             PayloadArguments arguments = new PayloadArguments();
             arguments.setData(data);
             PayloadProvider payloadProvider = new PayloadProvider(arguments);
             RichMenuCreateCommand richMenuCreateCommand =
                     new RichMenuCreateCommand(client,payloadProvider);
             richMenuCreateCommand.execute();
+        }catch (Exception e){
+            log.error("error ",e);
+        }
+        return Result.success("message is send").toJson();
+    }
+
+    @RequestMapping("/deleteRichMenu")
+    public String deleteRichMenu(@RequestBody Arguments arguments) throws JsonProcessingException {
+        log.info("arguments is {} ",arguments);
+        try {
+            RichMenuDeleteCommand command
+                = new RichMenuDeleteCommand(client,arguments);
+            command.execute();
+        }catch (Exception e){
+            log.error("error ",e);
+        }
+        return Result.success("message is send").toJson();
+    }
+
+    @RequestMapping("/getRichMenuList")
+    public List<RichMenuResponse> getRichMenuList(){
+        final RichMenuListResponse richMenuListResponse = getUnchecked(client.getRichMenuList());
+        log.info("Successfully finished.");
+
+        final List<RichMenuResponse> richMenus = richMenuListResponse.getRichMenus();
+        log.info("You have {} RichMenues", richMenus.size());
+        richMenus.forEach(richMenuResponse -> {
+            log.info("{}", richMenuResponse);
+        });
+        return richMenus;
+    }
+
+    @RequestMapping("/linkRichMenu")
+    public String linkRichMenu(@RequestBody Arguments arguments) throws JsonProcessingException {
+        log.info("arguments is {} ",arguments);
+        try {
+            RichMenuLinkRichMenuIdToUserCommand
+                    command = new RichMenuLinkRichMenuIdToUserCommand(client,arguments);
+            command.execute();
+        }catch (Exception e){
+            log.error("error ",e);
+        }
+        return Result.success("message is send").toJson();
+    }
+
+    @RequestMapping("/getRichMenuIdByUser")
+    public RichMenuIdResponse getRichMenuIdByUser(@RequestBody Arguments arguments){
+        try {
+            final String userId = checkNotNull(arguments.getUserId(), "--user-id= is not set.");
+            final RichMenuIdResponse richMenuIdResponse =
+                    getUnchecked(client.getRichMenuIdOfUser(userId));
+            log.info("Successfully finished.");
+            log.info("response = {}", richMenuIdResponse);
+            return richMenuIdResponse;
+        }catch (Exception e){
+            log.error("error ",e);
+        }
+        return null;
+    }
+
+    @RequestMapping("/unLinkRichMenu")
+    public String unLinkRichMenu(@RequestBody Arguments arguments) throws JsonProcessingException {
+        log.info("arguments is {} ",arguments);
+        try {
+            RichMenuUnlinkRichMenuIdFromUserCommand
+                    command = new RichMenuUnlinkRichMenuIdFromUserCommand(client,arguments);
+            command.execute();
         }catch (Exception e){
             log.error("error ",e);
         }
