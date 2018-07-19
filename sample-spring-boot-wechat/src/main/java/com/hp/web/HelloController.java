@@ -10,18 +10,20 @@ import com.linecorp.bot.cli.arguments.Arguments;
 import com.linecorp.bot.cli.arguments.PayloadArguments;
 import com.linecorp.bot.cli.arguments.PayloadProvider;
 import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.model.richmenu.RichMenuIdResponse;
 import com.linecorp.bot.model.richmenu.RichMenuListResponse;
 import com.linecorp.bot.model.richmenu.RichMenuResponse;
 import com.linecorp.bot.spring.boot.LineBotProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -148,6 +150,28 @@ public class HelloController {
         }catch (Exception e){
             log.error("error ",e);
         }
+        return Result.success("message is send").toJson();
+    }
+
+    @RequestMapping(value="/uploadRichMenuImage", method = RequestMethod.POST)
+    public @ResponseBody String uploadRichMenuImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("richMenuId") String richMenuIdParam)
+            throws JsonProcessingException {
+        String contentType = file.getContentType();
+        log.info("Content-Type: {}", contentType);
+        log.info("richMenuIdParam: {}", richMenuIdParam);
+        try {
+            final String richMenuId = checkNotNull(richMenuIdParam, "--rich-menu-id= is not set.");
+            byte[] bytes = file.getBytes();
+            final BotApiResponse botApiResponse =
+                    getUnchecked(client.setRichMenuImage(richMenuId, contentType, bytes));
+            log.info("Request Successfully finished. {}", botApiResponse);
+        } catch (Exception e) {
+            // TODO: handle exception
+            log.error("error : ",e);
+        }
+        //返回json
         return Result.success("message is send").toJson();
     }
 }
