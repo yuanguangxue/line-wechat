@@ -2,6 +2,7 @@ package com.hp.util;
 
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.model.LineMessage;
 import com.hp.model.LineUserProfile;
 import com.hp.model.PushMsg;
@@ -14,12 +15,15 @@ import com.linecorp.bot.model.event.message.AudioMessageContent;
 import com.linecorp.bot.model.event.message.ImageMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.profile.UserProfileResponse;
 import com.linecorp.bot.spring.boot.LineBotProperties;
 import lombok.extern.slf4j.Slf4j;
 
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,7 +76,16 @@ public class LineUtils {
         if(pushMsg.getTarget().equals("me")){
             return null;
         }
-        return new PushMessage(pushMsg.getTarget(), new TextMessage(pushMsg.getExtra()));
+        Message message;
+        //判断
+        try {
+            ObjectMapper mapper = ModelObjectMapper.createNewObjectMapper();
+            message = mapper.readValue(pushMsg.getExtra(),Message.class);
+            log.info("message class is {} ",message.getClass());
+        }catch (Exception e){
+            message = new TextMessage(pushMsg.getExtra());
+        }
+        return new PushMessage(pushMsg.getTarget(), message);
     }
 
     public static SenderLineMessage senderLineMessageToEntity(PushMsg pushMsg){

@@ -59,6 +59,13 @@ $(function () {
     //选中表情
     $('.exp_cont a').click(function () {
         var _this = $(this);
+        if(_this.hasClass("sticker")){
+            sendSticker(_this);
+             $('#web_wechat_pic').hide();
+             $('#btn_send').show();
+             resetMessageArea();
+            return;
+        }
         var html = '<img class="' + _this[0].className + '" title="' + _this.html() + '" src="images/spacer.gif">';
         _editArea.html(_editArea.html() + html);
         $('#web_wechat_pic').hide();
@@ -121,6 +128,39 @@ $(function () {
             $('.box_ft_bd').addClass('hide');
         }
     });
+
+    function sendSticker(a){
+        var userId = $(".panel>ul>li>a.current").data("id");
+        var str = JSON.stringify({
+            type:"sticker",
+            packageId:"1",
+            stickerId:a.data("id")
+        });
+        var msg = {
+             "appId": appId,
+             "appKey": appKey,
+             "platform": "ALL",
+             "audienceType": "ALIAS",
+             "audiences": ["testuser1"],
+             "extra": str,
+             "alert": "send line message",
+             "sound": "default",
+             "pushMsgType":"LINE",
+             "badge": 1,
+             "smsMessage": str,
+             "sender" : "me",
+             "target": userId
+        }
+        fetch(getHTTPHead() + getServiceUrl() + "/msgpush/send",{
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json"
+            },
+            body: JSON.stringify(msg)
+        }).then(function(res) {
+             console.info(res);
+        });
+    }
 
     function sendMsg(str) {
          var userId = $(".panel>ul>li>a.current").data("id");
