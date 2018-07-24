@@ -1015,6 +1015,26 @@ a.btn {
 }
 
 
+.flex {
+    float: left;
+    font-size: 0;
+    text-indent: -999em;
+    border-bottom: 1px solid #F0F0F0;
+    border-right: 1px solid #F0F0F0;
+    cursor: pointer;
+    background: url(img/Sticker1.png) top left no-repeat;
+    width: 68px;
+    height: 68px;
+    display: inline;
+    display: -moz-inline-stack;
+    display: inline-block;
+    vertical-align: top;
+    zoom: 1;
+    *display: inline;
+}
+.flex.flex0{
+    background-position: -2px 2px;
+}
 /*表情end*/
 
 

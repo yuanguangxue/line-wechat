@@ -60,11 +60,20 @@ $(function () {
     $('.exp_cont a').click(function () {
         var _this = $(this);
         if(_this.hasClass("sticker")){
-            sendSticker(_this);
+             sendSticker(_this);
              $('#web_wechat_pic').hide();
              $('#btn_send').show();
              resetMessageArea();
-            return;
+             $('.box_ft_bd').addClass('hide');
+             return;
+        }
+        if(_this.hasClass("flex")){
+             sendFlex(_this);
+             $('#web_wechat_pic').hide();
+             $('#btn_send').show();
+             resetMessageArea();
+             $('.box_ft_bd').addClass('hide');
+             return;
         }
         var html = '<img class="' + _this[0].className + '" title="' + _this.html() + '" src="images/spacer.gif">';
         _editArea.html(_editArea.html() + html);
@@ -130,36 +139,37 @@ $(function () {
     });
 
     function sendSticker(a){
-        var userId = $(".panel>ul>li>a.current").data("id");
         var str = JSON.stringify({
             type:"sticker",
             packageId:"1",
             stickerId:a.data("id")
         });
-        var msg = {
-             "appId": appId,
-             "appKey": appKey,
-             "platform": "ALL",
-             "audienceType": "ALIAS",
-             "audiences": ["testuser1"],
-             "extra": str,
-             "alert": "send line message",
-             "sound": "default",
-             "pushMsgType":"LINE",
-             "badge": 1,
-             "smsMessage": str,
-             "sender" : "me",
-             "target": userId
-        }
-        fetch(getHTTPHead() + getServiceUrl() + "/msgpush/send",{
-            method: "POST",
-            headers: {
-               "Content-Type": "application/json"
-            },
-            body: JSON.stringify(msg)
-        }).then(function(res) {
-             console.info(res);
+        sendMsg(str);
+    }
+
+    function sendFlex(a){
+        var str = JSON.stringify({
+             "type": "flex",
+             "altText": "this is a flex message",
+             "contents": {
+                 "type": "bubble",
+                 "body": {
+                     "type": "box",
+                     "layout": "vertical",
+                     "contents": [
+                         {
+                           "type": "text",
+                           "text": "hello"
+                         },
+                         {
+                           "type": "text",
+                           "text": "world"
+                         }
+                     ]
+                 }
+             }
         });
+        sendMsg(str);
     }
 
     function sendMsg(str) {
