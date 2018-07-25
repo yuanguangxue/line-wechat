@@ -164,6 +164,34 @@ $(function () {
                          {
                            "type": "text",
                            "text": "world"
+                         }，
+                         {
+                            "type": "button",
+                            "style": "primary",
+                            "action": {
+                              "type": "uri",
+                              "label": "Primary url button",
+                              "uri": "https://guangxue.herokuapp.com"
+                            }
+                         },
+                         {
+                            "type": "button",
+                            "style": "primary",
+                            "action": {
+                                "type":"postback",
+                                "label":"Buy",
+                                "data":"action=buy&itemid=111",
+                                "text":"Primary postback button"
+                            }
+                         },
+                         {
+                             "type": "button",
+                             "style": "primary",
+                             "action": {
+                                "type":"message",
+                                "label":"Primary message button",
+                                "text":"Yes"
+                             }
                          }
                      ]
                  }
