@@ -164,7 +164,7 @@ $(function () {
                          {
                            "type": "text",
                            "text": "world"
-                         }，
+                         },
                          {
                             "type": "button",
                             "style": "primary",
