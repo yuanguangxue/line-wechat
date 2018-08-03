@@ -34,4 +34,6 @@ public class LineUserProfileService {
     public List<LineUserProfile> findExistsUserId(Pageable pageable){
         return lineUserProfileRepository.findAll((root, query, cb) -> cb.isNotNull(root.get("userId")),pageable).getContent();
     }
+
+
 }
