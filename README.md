@@ -1,4 +1,4 @@
-# The Messaging API SDK for Java
+# The Messaging API SDK and simple chat room for Java 
 
 [![Build Status](https://travis-ci.org/line/line-bot-sdk-java.svg?branch=master)](https://travis-ci.org/line/line-bot-sdk-java)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.linecorp.bot/line-bot-model/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.linecorp.bot/line-bot-model)
@@ -91,7 +91,7 @@ This project contains the following sample projects:
  * sample-spring-boot-kitchensink: Full featured sample code.
  * sample-spring-boot-wechat: A simple chat room  server.
 ## Chat Room Images
-![](https://guangxue.herokuapp.com/images/2018-08-08_10-07-30.png)
+![1](https://guangxue.herokuapp.com/images/2018-08-08_10-07-30.png)
  
 ## Requirements
 
