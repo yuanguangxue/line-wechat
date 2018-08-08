@@ -78,7 +78,12 @@ public class Application {
             }catch (Exception e){
             }
             if(lineUserProfile == null){
-                doSaveUserProfile(messageEvent.getTo());
+                try {
+                    doSaveUserProfile(messageEvent.getTo());
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return;
+                }
             }
             LineMessage lineMessage = LineUtils.messageEventToEntity(messageEvent,lineBotProperties);
             lineMessageService.save(lineMessage);
