@@ -1,3 +1,4 @@
+/*
 package com.hp.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,3 +58,4 @@ public class JpaConfiguration {
         return hibernateJpaVendorAdapter;
     }
 }
+*/
