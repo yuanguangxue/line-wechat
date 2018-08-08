@@ -1,3 +1,4 @@
+/*
 package com.hp.config;
 
 
@@ -19,3 +20,4 @@ public class DataSourceConfiguration {
         return dataSourceBuilder.build();
     }
 }
+*/
