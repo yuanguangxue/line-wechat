@@ -167,6 +167,7 @@ class LineMessagingServiceBuilder {
 
         interceptors.forEach(okHttpClientBuilder::addInterceptor);
         okHttpClientBuilder
+                //.proxy()
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
                 .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS);

@@ -89,7 +89,10 @@ This project contains the following sample projects:
 
  * sample-spring-boot-echo: A simple echo server. It includes a Heroku button.
  * sample-spring-boot-kitchensink: Full featured sample code.
-
+ * sample-spring-boot-wechat: A simple chat room  server.
+## Chat Room Images
+![](https://guangxue.herokuapp.com/images/2018-08-08_10-07-30.png)
+ 
 ## Requirements
 
 This library requires Java 8 or later.
